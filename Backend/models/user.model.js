@@ -30,9 +30,43 @@ const userSchema = new mongoose.Schema({
     select: false,
     minlength: [6, "Password must be at least six characters long"],
   },
-  socketId: {
+  verifyOtp: {
     type: String,
     default: null,
+  },
+  verifyOtpExpireAt: {
+    type: Date,
+    default: null,
+  },
+  isAccountVerified: {
+    type: Boolean,
+    default: false,
+  },
+  resetOtp: {
+    type: String,
+    default: "",
+  },
+  resetOtpExpireAt: {
+    type: Date,
+    default: 0,
+  },
+  isPremium: {
+    type: Boolean,
+    default: false,
+  },
+  profilePicture: {
+    type: String,
+    default: "/profile",
+  },
+  trialStartDate: {
+    type: Date,
+    default: Date.now,
+  },
+  trialEndDate: {
+    type: Date,
+    default: function () {
+      return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    },
   },
 });
 
@@ -49,6 +83,10 @@ userSchema.methods.comparePassword = async function (password) {
 
 userSchema.statics.hashPassword = async function (password) {
   return await bcrypt.hash(password, 10);
+};
+
+userSchema.methods.isTrialActive = function () {
+  return Date.now() <= this.trialEndDate;
 };
 
 const userModel = mongoose.model("User", userSchema);
