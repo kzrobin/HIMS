@@ -50,6 +50,34 @@ const ItemTable = () => {
   // Category filter state
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // Filtered items based on category
+  const filteredItems = selectedCategory
+    ? items.filter((item) => item.category === selectedCategory)
+    : items;
+
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  // Handle sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Sort items based on sortConfig
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   // Handle item form
   const handleAddItem = () => setShowItemForm(true);
   const handleCloseForm = () => setShowItemForm(false);
@@ -64,11 +92,6 @@ const ItemTable = () => {
     setSelectedCategory(event.target.value);
     setCurrentPage(1); // Reset pagination when category changes
   };
-
-  // Filtered items based on category
-  const filteredItems = selectedCategory
-    ? items.filter((item) => item.category === selectedCategory)
-    : items;
 
   // Total number of pages
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -164,59 +187,131 @@ const ItemTable = () => {
               {visibleColumns.image && (
                 <th className="px-4 py-3 text-left text-xs font-bold">Image</th>
               )}
-              <th className="px-4 py-3 text-left text-xs font-bold">Name</th>
+              <th
+                className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                Name
+                {sortConfig.key === "name" && (
+                  <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                )}
+              </th>
               {visibleColumns.category && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("category")}
+                >
                   Category
+                  {sortConfig.key === "category" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.storeLocation && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("storeLocation")}
+                >
                   Store Location
+                  {sortConfig.key === "storeLocation" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.purchaseDate && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("purchaseDate")}
+                >
                   Purchase Date
+                  {sortConfig.key === "purchaseDate" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.expiryDate && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("expiryDate")}
+                >
                   Expiry Date
+                  {sortConfig.key === "expiryDate" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.quantity && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("quantity")}
+                >
                   Quantity
+                  {sortConfig.key === "quantity" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.value && (
-                <th className="px-4 py-3 text-left text-xs font-bold">Value</th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("value")}
+                >
+                  Value
+                  {sortConfig.key === "value" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
+                </th>
               )}
               {visibleColumns.notes && (
-                <th className="px-4 py-3 text-left text-xs font-bold">Notes</th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("notes")}
+                >
+                  Notes
+                  {sortConfig.key === "notes" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
+                </th>
               )}
               {visibleColumns.serialNumber && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("serialNumber")}
+                >
                   Serial Number
+                  {sortConfig.key === "serialNumber" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.purchaseLocation && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("purchaseLocation")}
+                >
                   Purchase Location
+                  {sortConfig.key === "purchaseLocation" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               {visibleColumns.createdAt && (
-                <th className="px-4 py-3 text-left text-xs font-bold">
+                <th
+                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("createdAt")}
+                >
                   Created At
+                  {sortConfig.key === "createdAt" && (
+                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
+                  )}
                 </th>
               )}
               <th className="px-4 py-3 text-left text-xs font-bold">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentItems.length > 0 ? (
-              currentItems.map((item) => (
+            {sortedItems.length > 0 ? (
+              sortedItems.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-50">
                   {visibleColumns.image && (
                     <td className="px-4 py-3">
