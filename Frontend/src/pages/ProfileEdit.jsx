@@ -4,6 +4,7 @@ import { UserDataContext } from "../context/UserContext";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import { toast } from "react-toastify";
+import { uploadImageToCloudinary } from "../utils/ImageUpload";
 
 const ProfileEdit = ({ onCancel }) => {
   const { user, setUser, backendUrl, getUser } = useContext(UserDataContext);
@@ -31,6 +32,9 @@ const ProfileEdit = ({ onCancel }) => {
     useState(false);
   const [showEditPasswordModal, setShowEditPasswordModal] = useState(false);
 
+  const [isUpdatingProfilePicture, setIsUpdatingProfilePicture] =
+    useState(false);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -49,6 +53,8 @@ const ProfileEdit = ({ onCancel }) => {
         setPreviewPicture(reader.result);
       };
       reader.readAsDataURL(file);
+
+      // console.log("Image", file);
     }
   };
 
@@ -74,7 +80,7 @@ const ProfileEdit = ({ onCancel }) => {
       setPasswordError("New password and confirm password do not match");
       return false;
     }
-    setPasswordError(""); 
+    setPasswordError("");
     return true;
   };
 
@@ -106,25 +112,33 @@ const ProfileEdit = ({ onCancel }) => {
   };
 
   const updateProfilePicture = async () => {
+    setIsUpdatingProfilePicture(true);
     try {
-      const response = await axios.put(
-        `${backendUrl}/users/update-profile-picture`,
-        {
-          profilePicture: previewPicture, // Use the preview picture for the API call
-        },
-        {
-          withCredentials: true,
-        }
-      );
-      setUser(response.data.user);
-      setProfilePicture(previewPicture); // Update the actual profile picture
-      toast.success("Profile picture updated successfully");
-      setProfilePictureError("");
-      setShowEditProfilePictureModal(false); // Close the modal after successful update
+      // console.log(previewPicture);
+
+      const imageUrl = await uploadImageToCloudinary(previewPicture);
+      if (imageUrl) {
+        const response = await axios.put(
+          `${backendUrl}/users/update-profile-picture`,
+          {
+            profilePicture: imageUrl, // Use the preview picture for the API call
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        setUser(response.data.user);
+        setProfilePicture(previewPicture);
+        toast.success("Profile picture updated successfully");
+        setProfilePictureError("");
+        setShowEditProfilePictureModal(false);
+      }
     } catch (err) {
       setProfilePictureError(
         err.response?.data?.message || "Error updating profile picture"
       );
+    } finally {
+      setIsUpdatingProfilePicture(false);
     }
   };
 
@@ -218,8 +232,11 @@ const ProfileEdit = ({ onCancel }) => {
                   <button
                     onClick={updateProfilePicture}
                     className="bg-gradient-to-r from-[#62b878] via-[#4FCF70] to-[#3BCD5B] text-white px-6 py-2 rounded-lg hover:from-[#3BCD5B] hover:via-[#34D399] hover:to-[#2FAF60] transition-colors"
+                    disabled={isUpdatingProfilePicture}
                   >
-                    Save Profile Picture
+                    {isUpdatingProfilePicture
+                      ? "Updating Image..."
+                      : "Save Profile Picture"}
                   </button>
                   <button
                     onClick={cancelProfilePictureChange}

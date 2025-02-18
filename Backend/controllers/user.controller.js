@@ -396,6 +396,8 @@ module.exports.updateName = async (req, res, next) => {
         isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
+        trialStartDate: user.trialStartDate,
+        trialEndDate: user.trialEndDate,
       },
     });
   } catch (error) {
@@ -450,6 +452,8 @@ module.exports.updateProfilePicture = async (req, res, next) => {
         isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
+        trialStartDate: user.trialStartDate,
+        trialEndDate: user.trialEndDate,
       },
     });
   } catch (error) {
@@ -518,6 +522,8 @@ module.exports.subscribePremium = async (req, res, next) => {
         isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
+        trialStartDate: user.trialStartDate,
+        trialEndDate: user.trialEndDate,
       },
     });
   } catch (error) {

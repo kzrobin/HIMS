@@ -15,6 +15,14 @@ const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <main className="flex-grow">
+        {/* Free Trial Banner */}
+        <div className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white text-center py-3">
+          <p className="text-lg font-semibold">
+            🎉 Start your <strong>7-day free trial</strong> today! No credit
+            card required. 🎉
+          </p>
+        </div>
+
         {/* Hero Section with Wave Background */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -43,12 +51,12 @@ const Landing = () => {
 
                 {/* Navbar Links and Buttons */}
                 <div className="flex items-center space-x-6">
-                  <Link to="/login" className="hidden md:block">
+                  <Link to="/login">
                     <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all">
                       Login
                     </button>
                   </Link>
-                  <Link to="/signup">
+                  <Link to="/signup" className="hidden md:block">
                     <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all text-nowrap">
                       Sign Up
                     </button>
@@ -66,11 +74,12 @@ const Landing = () => {
               Smart Home Inventory Management
             </h2>
             <p className="text-xl md:text-2xl mb-8 text-indigo-100 max-w-3xl mx-auto">
-              Keep track of everything in your home effortlessly.
+              Keep track of everything in your home effortlessly. Start your{" "}
+              <strong>7-day free trial</strong> today!
             </p>
             <Link to="/signup">
               <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
-                Start Organizing Today
+                Start Free Trial
               </button>
             </Link>
           </div>
@@ -116,48 +125,43 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Benefits Section */}
-        <div className="py-24 bg-white relative">
-          {/* Wave Background */}
-          <div className="absolute top-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20"></div>
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h3 className="text-3xl font-bold mb-4">
-                Why Choose Home Inventory?
-              </h3>
-              <p className="text-xl text-gray-600">
-                Experience the benefits of organized living
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-12">
-              <div className="flex items-start space-x-4">
-                <Shield className="h-8 w-8 text-blue-600 flex-shrink-0" />
-                <div>
-                  <h4 className="text-xl font-semibold mb-2">
-                    Secure & Private
-                  </h4>
-                  <p className="text-gray-600">
-                    Your data is encrypted and stored securely. We prioritize
-                    your privacy and security above all.
-                  </p>
-                </div>
+        {/* Free Trial Explanation Section */}
+        <section className="py-24 bg-white relative">
+          <div className="container mx-auto px-4 text-center">
+            <h3 className="text-3xl font-bold mb-4">
+              Try Home Inventory for Free
+            </h3>
+            <p className="text-xl text-gray-600 mb-8">
+              Experience all the features of Home Inventory with our{" "}
+              <strong>7-day free trial</strong>. No credit card required!
+            </p>
+            <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+              <div className="bg-gray-50 p-8 rounded-xl shadow-md">
+                <h4 className="text-xl font-semibold mb-4">What's Included</h4>
+                <ul className="text-gray-600 text-left list-disc list-inside">
+                  <li>Full access to all features</li>
+                  <li>Unlimited item tracking</li>
+                  <li>Advanced analytics and reports</li>
+                  <li>Priority customer support</li>
+                </ul>
               </div>
-              <div className="flex items-start space-x-4">
-                <BarChart className="h-8 w-8 text-blue-600 flex-shrink-0" />
-                <div>
-                  <h4 className="text-xl font-semibold mb-2">
-                    Insights & Analytics
-                  </h4>
-                  <p className="text-gray-600">
-                    Get valuable insights about your inventory with detailed
-                    analytics and reports.
-                  </p>
-                </div>
+              <div className="bg-gray-50 p-8 rounded-xl shadow-md">
+                <h4 className="text-xl font-semibold mb-4">How It Works</h4>
+                <ul className="text-gray-600 text-left list-disc list-inside">
+                  <li>Sign up in seconds</li>
+                  <li>Start organizing immediately</li>
+                  <li>Cancel anytime during the trial</li>
+                  <li>No hidden fees</li>
+                </ul>
               </div>
             </div>
+            <Link to="/signup" className="mt-12 inline-block">
+              <button className="text-lg px-8 py-4 bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
+                Start Free Trial
+              </button>
+            </Link>
           </div>
-        </div>
+        </section>
 
         {/* Call to Action Section */}
         <motion.div
@@ -172,11 +176,12 @@ const Landing = () => {
           <div className="container mx-auto px-4 text-center">
             <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
             <p className="text-xl mb-8">
-              Join thousands of organized households today.
+              Join thousands of organized households today. Start your{" "}
+              <strong>7-day free trial</strong> now!
             </p>
             <Link to="/signup">
               <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
-                Create Free Account
+                Create new account
               </button>
             </Link>
           </div>

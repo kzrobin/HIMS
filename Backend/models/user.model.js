@@ -56,7 +56,8 @@ const userSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String,
-    default: "/profile",
+    default:
+      "https://res.cloudinary.com/kz-cloud/image/upload/v1739721991/gbl7pu9pdzw5w3wkxuqp.svg",
   },
   trialStartDate: {
     type: Date,

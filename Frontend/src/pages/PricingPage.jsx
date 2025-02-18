@@ -1,16 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
-import { SubscriptionCard } from "../components/SubscriptionCard";
+import SubscriptionCard from "../components/SubscriptionCard";
 import { Footer } from "../components/Footer";
 
 const PricingPage = () => {
   const navigate = useNavigate();
 
   const handleSubscribe = (tier) => {
-    // In a real app, this would handle the subscription process
     if (tier === "premium") {
-      // Redirect to payment processing
       console.log("Processing premium subscription");
     } else {
       navigate("/signup");
@@ -22,8 +20,8 @@ const PricingPage = () => {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center">
-            <Package className="h-8 w-8 text-blue-600" />
-            <h1 className="ml-3 text-2xl font-bold text-gray-900">
+            <Package className="h-8 w-8 text-[#3BCD5B]" />
+            <h1 className="ml-3 text-2xl font-bold text-[#1C542A]">
               Home Inventory Pricing
             </h1>
           </div>
@@ -33,7 +31,7 @@ const PricingPage = () => {
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-[#1C542A] mb-4">
               Choose Your Plan
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -41,7 +39,7 @@ const PricingPage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <SubscriptionCard
               tier="free"
               onSubscribe={() => handleSubscribe("free")}
@@ -50,15 +48,15 @@ const PricingPage = () => {
               tier="premium"
               onSubscribe={() => handleSubscribe("premium")}
             />
-          </div>
+          </div> */}
 
           <div className="mt-16 text-center">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <h3 className="text-2xl font-bold text-[#1C542A] mb-4">
               Premium Features in Detail
             </h3>
             <div className="grid md:grid-cols-3 gap-8 mt-8">
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h4 className="text-xl font-semibold mb-4 text-amber-600">
+                <h4 className="text-xl font-semibold mb-4 text-[#3BCD5B]">
                   Advanced Organization
                 </h4>
                 <p className="text-gray-600">
@@ -68,7 +66,7 @@ const PricingPage = () => {
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h4 className="text-xl font-semibold mb-4 text-amber-600">
+                <h4 className="text-xl font-semibold mb-4 text-[#3BCD5B]">
                   Value Tracking
                 </h4>
                 <p className="text-gray-600">
@@ -77,7 +75,7 @@ const PricingPage = () => {
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h4 className="text-xl font-semibold mb-4 text-amber-600">
+                <h4 className="text-xl font-semibold mb-4 text-[#3BCD5B]">
                   Document Storage
                 </h4>
                 <p className="text-gray-600">

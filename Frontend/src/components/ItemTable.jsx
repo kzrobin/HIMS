@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import { ArrowUp, ArrowDown } from "lucide-react";
+import "react-resizable/css/styles.css";
 import {
   Trash2,
   Package,
@@ -7,11 +9,14 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  View,
+  PencilOff,
 } from "lucide-react";
 import { Tally3, ListFilter } from "lucide-react";
 import ItemForm from "./ItemForm";
 import { UserDataContext } from "../context/UserContext";
-
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 const ItemTable = () => {
   // User context
   const { items, getItems, user } = useContext(UserDataContext);
@@ -22,23 +27,36 @@ const ItemTable = () => {
   // Column visibility
   const [showColumns, setShowColumns] = useState(false);
 
-  // Initialize visibleColumns based on screen width
+  // Initialize visibleColumns based on screen width (stored in localStorage)
   const [visibleColumns, setVisibleColumns] = useState(() => {
+    const savedColumns = JSON.parse(localStorage.getItem("visibleColumns"));
+    if (savedColumns) return savedColumns;
+
     const screenWidth = window.innerWidth;
     return {
       category: true,
-      storeLocation: isPremium && screenWidth >= 768, // Show on medium screens and above
-      purchaseDate: screenWidth >= 768, // Show on medium screens and above
-      expiryDate: screenWidth >= 768, // Show on medium screens and above
-      quantity: isPremium && screenWidth >= 768, // Show on medium screens and above
-      value: isPremium && screenWidth >= 768, // Show on medium screens and above
-      notes: screenWidth >= 768, // Show on medium screens and above
-      serialNumber: screenWidth >= 1024, // Show on large screens and above
-      purchaseLocation: screenWidth >= 1024, // Show on large screens and above
-      createdAt: screenWidth >= 1024, // Show on large screens and above
-      image: screenWidth >= 768, // Show on medium screens and above
+      storeLocation: screenWidth >= 768,
+      purchaseDate: false,
+      expiryDate: screenWidth >= 768,
+      quantity: screenWidth >= 768,
+      value: screenWidth >= 768,
+      notes: screenWidth >= 768,
+      serialNumber: false,
+      purchaseLocation: screenWidth >= 1024,
+      createdAt: false,
+      image: screenWidth >= 768,
     };
   });
+
+  // Save column visibility to localStorage
+  useEffect(() => {
+    localStorage.setItem("visibleColumns", JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+
+  // Toggle column visibility
+  const toggleColumn = (column) => {
+    setVisibleColumns((prev) => ({ ...prev, [column]: !prev[column] }));
+  };
 
   // Item form state
   const [showItemForm, setShowItemForm] = useState(false);
@@ -50,33 +68,12 @@ const ItemTable = () => {
   // Category filter state
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Filtered items based on category
-  const filteredItems = selectedCategory
-    ? items.filter((item) => item.category === selectedCategory)
-    : items;
-
   // Sorting state
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
-  // Handle sorting
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  // Sort items based on sortConfig
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? 1 : -1;
-    }
-    return 0;
-  });
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Handle item form
   const handleAddItem = () => setShowItemForm(true);
@@ -90,14 +87,55 @@ const ItemTable = () => {
   // Handle category change
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
-    setCurrentPage(1); // Reset pagination when category changes
+    setCurrentPage(1);
+  };
+
+  // Handle search change
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset pagination when search term changes
+  };
+
+  // Filtered items based on category
+  const filteredItems = selectedCategory
+    ? items.filter((item) => item.category === selectedCategory)
+    : items;
+
+  // Sorting logic
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (!sortColumn) return 0;
+    const valueA = a[sortColumn] || "";
+    const valueB = b[sortColumn] || "";
+
+    if (typeof valueA === "string") {
+      return sortOrder === "asc"
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    } else {
+      return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+    }
+  });
+
+  // Filtered items based on search term
+  const searchedItems = sortedItems.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle sorting
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortOrder("asc");
+    }
   };
 
   // Total number of pages
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const totalPages = Math.ceil(searchedItems.length / itemsPerPage);
 
   // Slice items for current page
-  const currentItems = filteredItems.slice(
+  const currentItems = searchedItems.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -122,38 +160,58 @@ const ItemTable = () => {
   return (
     <div className="flex flex-col flex-1 h-full mx-4">
       {/* Features */}
-      <div className="flex flex-col sm:flex-row justify-between items-center px-5 sm:px-8 py-3 sm:py-4 gap-4">
-        <div className="flex justify-start items-center gap-2">
+      <div className="w-full flex flex-col sm:flex-row justify-between items-center px-5 sm:px-8 py-3 sm:py-4 gap-4">
+        {/* Left Section - Title & Column Toggle */}
+        <div className="flex items-center gap-2 relative">
           <h1 className="font-semibold text-2xl sm:text-3xl">Items</h1>
           <div>
             <Tally3
               onClick={() => setShowColumns(!showColumns)}
-              className={`text-4xl font-thin bg-white mt-[8px] opacity-50 hover:opacity-100 relative rounded-sm pl-1
-              ${showColumns ? "outline outline-2 outline-green-500" : ""}`}
+              className={`text-4xl font-thin bg-white mt-[8px] opacity-50 hover:opacity-100 rounded-sm pl-1 cursor-pointer transition ${
+                showColumns ? "outline outline-2 outline-green-500" : ""
+              }`}
             />
-            {showColumns && (
-              <div className="bg-white shadow-md p-3 rounded mt-2 w-60 absolute z-10">
-                {Object.keys(visibleColumns).map((key) => (
-                  <label key={key} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={visibleColumns[key]}
-                      onChange={() =>
-                        setVisibleColumns((prev) => ({
-                          ...prev,
-                          [key]: !prev[key],
-                        }))
-                      }
-                    />
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </label>
-                ))}
-              </div>
-            )}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{
+                opacity: showColumns ? 1 : 0,
+                y: showColumns ? 0 : -10,
+              }}
+              transition={{ duration: 0.2 }}
+              className="absolute left-0 mt-2 w-60 bg-white shadow-md p-3 rounded z-10"
+            >
+              {Object.keys(visibleColumns).map((key) => (
+                <label key={key} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={visibleColumns[key]}
+                    onChange={() =>
+                      setVisibleColumns((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                  />
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </label>
+              ))}
+            </motion.div>
           </div>
         </div>
+
+        {/* Search Bar */}
+        <div className="flex-1 flex justify-end items-center">
+          <input
+            type="text"
+            placeholder="Search items..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="outline-none p-2 rounded bg-white border border-gray-200 w-full sm:w-1/3"
+          />
+        </div>
+
+        {/* Filters & Add Button */}
         <div className="flex items-center gap-2">
-          {/* Category Filter */}
           <div className="listFilter flex bg-white px-2 py-2 rounded-lg border border-gray-200">
             <ListFilter className="pr-1 text-gray-600" />
             <select
@@ -169,149 +227,354 @@ const ItemTable = () => {
               <option value="Other">Other</option>
             </select>
           </div>
-          <button
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
             onClick={handleAddItem}
             className="bg-green-500 text-white px-3 sm:px-4 py-2 rounded-md shadow-md hover:bg-green-600 transition flex items-center gap-1"
           >
             <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">Add Item</span>
-          </button>
+          </motion.button>
         </div>
       </div>
-
       {/* Table */}
       <div className="overflow-x-auto flex-1 bg-white rounded-lg shadow my custom-scroll">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
               {visibleColumns.image && (
-                <th className="px-4 py-3 text-left text-xs font-bold">Image</th>
+                <th>
+                  <div className="flex items-center px-4 py-3 text-left text-xs font-bold">
+                    Image
+                  </div>
+                </th>
               )}
-              <th
-                className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                Name
-                {sortConfig.key === "name" && (
-                  <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                )}
+              <th>
+                <div
+                  className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  Name
+                  <span
+                    className={`ml-1 ${
+                      sortColumn === "name"
+                        ? sortOrder === "asc"
+                          ? "text-blue-500"
+                          : "text-red-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {sortColumn === "name" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp size={16} />
+                      ) : (
+                        <ArrowDown size={16} />
+                      )
+                    ) : (
+                      <ArrowUp size={16} />
+                    )}
+                  </span>
+                </div>
               </th>
               {visibleColumns.category && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("category")}
-                >
-                  Category
-                  {sortConfig.key === "category" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("category")}
+                  >
+                    Category
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "category"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "category" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.storeLocation && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("storeLocation")}
-                >
-                  Store Location
-                  {sortConfig.key === "storeLocation" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("storeLocation")}
+                  >
+                    Store Location
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "storeLocation"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "storeLocation" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.purchaseDate && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("purchaseDate")}
-                >
-                  Purchase Date
-                  {sortConfig.key === "purchaseDate" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("purchaseDate")}
+                  >
+                    Purchase Date
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "purchaseDate"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "purchaseDate" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.expiryDate && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("expiryDate")}
-                >
-                  Expiry Date
-                  {sortConfig.key === "expiryDate" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("expiryDate")}
+                  >
+                    Expiry Date
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "expiryDate"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "expiryDate" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.quantity && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("quantity")}
-                >
-                  Quantity
-                  {sortConfig.key === "quantity" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("quantity")}
+                  >
+                    Quantity
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "quantity"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "quantity" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.value && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("value")}
-                >
-                  Value
-                  {sortConfig.key === "value" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("value")}
+                  >
+                    Value
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "value"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "value" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.notes && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("notes")}
-                >
-                  Notes
-                  {sortConfig.key === "notes" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("notes")}
+                  >
+                    Notes
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "notes"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "notes" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.serialNumber && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("serialNumber")}
-                >
-                  Serial Number
-                  {sortConfig.key === "serialNumber" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("serialNumber")}
+                  >
+                    Serial Number
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "serialNumber"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "serialNumber" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.purchaseLocation && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("purchaseLocation")}
-                >
-                  Purchase Location
-                  {sortConfig.key === "purchaseLocation" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("purchaseLocation")}
+                  >
+                    Purchase Location
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "purchaseLocation"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "purchaseLocation" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               {visibleColumns.createdAt && (
-                <th
-                  className="px-4 py-3 text-left text-xs font-bold cursor-pointer"
-                  onClick={() => handleSort("createdAt")}
-                >
-                  Created At
-                  {sortConfig.key === "createdAt" && (
-                    <span>{sortConfig.direction === "asc" ? " ↑" : " ↓"}</span>
-                  )}
+                <th>
+                  <div
+                    className="flex items-center px-4 py-3 text-left text-xs font-bold cursor-pointer"
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                    <span
+                      className={`ml-1 ${
+                        sortColumn === "createdAt"
+                          ? sortOrder === "asc"
+                            ? "text-blue-500"
+                            : "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {sortColumn === "createdAt" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )
+                      ) : (
+                        <ArrowUp size={16} />
+                      )}
+                    </span>
+                  </div>
                 </th>
               )}
               <th className="px-4 py-3 text-left text-xs font-bold">Actions</th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedItems.length > 0 ? (
-              sortedItems.map((item) => (
+            {currentItems.length > 0 ? (
+              currentItems.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-50">
                   {visibleColumns.image && (
                     <td className="px-4 py-3">
@@ -347,9 +610,7 @@ const ItemTable = () => {
                     <td className="px-4 py-3">{item.quantity || "-"}</td>
                   )}
                   {visibleColumns.value && (
-                    <td className="px-4 py-3">
-                      ${item.value?.toLocaleString() || "-"}
-                    </td>
+                    <td className="px-4 py-3">{item.value || "-"}</td>
                   )}
                   {visibleColumns.notes && (
                     <td className="px-4 py-3">{item.notes || "-"}</td>
@@ -369,7 +630,14 @@ const ItemTable = () => {
                         : "-"}
                     </td>
                   )}
-                  <td className="px-4 py-3">
+                  <td className=" flex justify-start items-center gap-3 px-4 py-3">
+                    <Link>
+                      <PencilOff className="h-5 w-5" />
+                    </Link>
+                    <Link to={`/item/${item._id}`}>
+                      {" "}
+                      <View className="h-5 w-5" />
+                    </Link>
                     <button className="text-red-600 hover:text-red-900 transition-colors">
                       <Trash2 className="h-5 w-5" />
                     </button>
@@ -392,7 +660,6 @@ const ItemTable = () => {
           </tbody>
         </table>
       </div>
-
       {/* Pagination */}
       <div className="flex justify-center items-center mt-4 space-x-2 mb-4">
         <button
@@ -427,18 +694,11 @@ const ItemTable = () => {
           <ChevronsRight className="h-4 w-4" />
         </button>
       </div>
-
       {showItemForm && (
         <ItemForm onClose={handleCloseForm} onSave={handleSaveItem} />
       )}
     </div>
   );
-};
-
-ItemTable.defaultProps = {
-  items: [],
-  isPremium: false,
-  handleDeleteItem: () => {},
 };
 
 export default ItemTable;

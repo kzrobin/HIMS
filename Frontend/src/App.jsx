@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import UserProtectedWraper from "./pages/UserProtectedWraper";
+import UserProtectedWrapper from "./pages/UserProtectedWrapper";
+import NonAuthWrapper from "./pages/NonAuthWrapper"; // Import the new wrapper
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -13,94 +14,98 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ProfileEdit from "./pages/ProfileEdit";
 import Item from "./pages/Item";
 import Test from "./pages/Test";
+import PricingPage from "./pages/PricingPage";
+import Subscription from "./pages/Subscription";
 
 function App() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Landing />} />
       <Route
         path="/login"
         element={
-          <UserProtectedWraper authOnly={false}>
+          <NonAuthWrapper>
             <Login />
-          </UserProtectedWraper>
+          </NonAuthWrapper>
         }
       />
       <Route
         path="/signup"
         element={
-          <UserProtectedWraper authOnly={false}>
+          <NonAuthWrapper>
             <Signup />
-          </UserProtectedWraper>
+          </NonAuthWrapper>
         }
       />
+      <Route path="/subscription" element={<Subscription />} />
+      <Route path="/test" element={<Test />} />
+
+      {/* Protected Routes */}
       <Route
         path="/dashboard"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <Dashboard />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/profile"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <Profile />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/verify"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <VerifyEmail />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/profile-update"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <ProfileEdit />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/logout"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <Logout />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/report"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <Report />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
       <Route
         path="/item/:itemId"
         element={
-          <UserProtectedWraper>
+          <UserProtectedWrapper>
             <Item />
-          </UserProtectedWraper>
+          </UserProtectedWrapper>
         }
       />
-
       <Route
         path="/reset-password"
         element={
-          // <UserProtectedWraper>
-          //   <ResetPassword />
-          // </UserProtectedWraper>
-          <ResetPassword />
+          <NonAuthWrapper>
+            <ResetPassword />
+          </NonAuthWrapper>
         }
       />
-      <Route path="/test" element={<Test />}></Route>
     </Routes>
   );
 }
