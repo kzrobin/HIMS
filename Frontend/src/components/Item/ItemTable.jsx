@@ -14,15 +14,14 @@ import {
 } from "lucide-react";
 import { Tally3, ListFilter } from "lucide-react";
 import ItemForm from "./ItemForm";
-import { UserDataContext } from "../context/UserContext";
-import { motion } from "framer-motion";
+import { UserDataContext } from "../../context/UserContext";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import DeleteItem from "./DeleteItem";
+
 const ItemTable = () => {
   // User context
-  const { items, getItems, user } = useContext(UserDataContext);
-
-  // Check premium features
-  const isPremium = user.isPremium;
+  const { items, getItems } = useContext(UserDataContext);
 
   // Column visibility
   const [showColumns, setShowColumns] = useState(false);
@@ -53,14 +52,6 @@ const ItemTable = () => {
     localStorage.setItem("visibleColumns", JSON.stringify(visibleColumns));
   }, [visibleColumns]);
 
-  // Toggle column visibility
-  const toggleColumn = (column) => {
-    setVisibleColumns((prev) => ({ ...prev, [column]: !prev[column] }));
-  };
-
-  // Item form state
-  const [showItemForm, setShowItemForm] = useState(false);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -76,13 +67,7 @@ const ItemTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Handle item form
-  const handleAddItem = () => setShowItemForm(true);
-  const handleCloseForm = () => setShowItemForm(false);
-
-  // Save new item
-  const handleSaveItem = (newItem) => {
-    setShowItemForm(false);
-  };
+  const [showItemForm, setShowItemForm] = useState(false);
 
   // Handle category change
   const handleCategoryChange = (event) => {
@@ -104,10 +89,11 @@ const ItemTable = () => {
   // Sorting logic
   const sortedItems = [...filteredItems].sort((a, b) => {
     if (!sortColumn) return 0;
+
     const valueA = a[sortColumn] || "";
     const valueB = b[sortColumn] || "";
 
-    if (typeof valueA === "string") {
+    if (typeof valueA === "string" && typeof valueB === "string") {
       return sortOrder === "asc"
         ? valueA.localeCompare(valueB)
         : valueB.localeCompare(valueA);
@@ -123,6 +109,7 @@ const ItemTable = () => {
 
   // Handle sorting
   const handleSort = (column) => {
+    console.log(column);
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -150,6 +137,10 @@ const ItemTable = () => {
   const handleFirstPage = () => setCurrentPage(1);
   const handleLastPage = () => setCurrentPage(totalPages);
 
+  //handle delete status
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteItemId, SetDeleteItemId] = useState(null);
+
   // Get items when component mounts
   useEffect(() => {
     getItems();
@@ -171,31 +162,35 @@ const ItemTable = () => {
                 showColumns ? "outline outline-2 outline-green-500" : ""
               }`}
             />
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{
-                opacity: showColumns ? 1 : 0,
-                y: showColumns ? 0 : -10,
-              }}
-              transition={{ duration: 0.2 }}
-              className="absolute left-0 mt-2 w-60 bg-white shadow-md p-3 rounded z-10"
-            >
-              {Object.keys(visibleColumns).map((key) => (
-                <label key={key} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={visibleColumns[key]}
-                    onChange={() =>
-                      setVisibleColumns((prev) => ({
-                        ...prev,
-                        [key]: !prev[key],
-                      }))
-                    }
-                  />
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </label>
-              ))}
-            </motion.div>
+            <AnimatePresence>
+              {showColumns && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{
+                    opacity: showColumns ? 1 : 0,
+                    y: showColumns ? 0 : -10,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute left-0 mt-2 w-60 bg-white shadow-md p-3 rounded z-10"
+                >
+                  {Object.keys(visibleColumns).map((key) => (
+                    <label key={key} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={visibleColumns[key]}
+                        onChange={() =>
+                          setVisibleColumns((prev) => ({
+                            ...prev,
+                            [key]: !prev[key],
+                          }))
+                        }
+                      />
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </label>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -231,7 +226,7 @@ const ItemTable = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
-            onClick={handleAddItem}
+            onClick={() => setShowItemForm(true)}
             className="bg-green-500 text-white px-3 sm:px-4 py-2 rounded-md shadow-md hover:bg-green-600 transition flex items-center gap-1"
           >
             <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -631,14 +626,20 @@ const ItemTable = () => {
                     </td>
                   )}
                   <td className=" flex justify-start items-center gap-3 px-4 py-3">
-                    <Link>
+                    <Link to={`/item/edit/${item._i}`}>
                       <PencilOff className="h-5 w-5" />
                     </Link>
                     <Link to={`/item/${item._id}`}>
                       {" "}
                       <View className="h-5 w-5" />
                     </Link>
-                    <button className="text-red-600 hover:text-red-900 transition-colors">
+                    <button
+                      className="text-red-600 hover:text-red-900 transition-colors"
+                      onClick={() => {
+                        SetDeleteItemId(item._id);
+                        setShowDeleteConfirm(true);
+                      }}
+                    >
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </td>
@@ -694,8 +695,15 @@ const ItemTable = () => {
           <ChevronsRight className="h-4 w-4" />
         </button>
       </div>
-      {showItemForm && (
-        <ItemForm onClose={handleCloseForm} onSave={handleSaveItem} />
+      {showItemForm && <ItemForm onClose={() => setShowItemForm(false)} />}
+      {showDeleteConfirm && (
+        <DeleteItem
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            SetDeleteItemId(null);
+          }}
+          deleteItem={deleteItemId}
+        />
       )}
     </div>
   );

@@ -75,7 +75,7 @@ router.get(
   getItem
 );
 router.post("/add", authUser, addItem); // 3. Add a new item
-router.put("/update/:itemId", authUser, validateUpdateItem, updateItem);
+router.put("/update/:itemId", authUser, updateItem);
 router.delete("/delete/:itemId", authUser, validateDeleteItem, deleteItem);
 
 module.exports = router;

@@ -16,6 +16,7 @@ import Item from "./pages/Item";
 import Test from "./pages/Test";
 import PricingPage from "./pages/PricingPage";
 import Subscription from "./pages/Subscription";
+import EditItem from "./pages/EditItem";
 
 function App() {
   return (
@@ -87,6 +88,14 @@ function App() {
         element={
           <UserProtectedWrapper>
             <Report />
+          </UserProtectedWrapper>
+        }
+      />
+      <Route
+        path="/item/edit/:itemId"
+        element={
+          <UserProtectedWrapper>
+            <EditItem />
           </UserProtectedWrapper>
         }
       />

@@ -77,6 +77,8 @@ module.exports.addItem = async (req, res) => {
 
 module.exports.updateItem = async (req, res) => {
   try {
+    console.log("update");
+    console.log(req.body);
     const { itemId } = req.params;
     const updates = req.body;
 

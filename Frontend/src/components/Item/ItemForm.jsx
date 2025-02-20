@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { UserDataContext } from "../context/UserContext";
-import { uploadImageToCloudinary } from "../utils/ImageUpload";
+import { UserDataContext } from "../../context/UserContext";
+import { uploadImageToCloudinary } from "../../utils/ImageUpload";
 import { toast } from "react-toastify";
 
-const ItemForm = ({ onClose, onSave }) => {
+const ItemForm = ({ onClose, }) => {
   const { backendUrl, getItems } = useContext(UserDataContext);
   const [formData, setFormData] = useState({
     name: "",
@@ -128,7 +128,6 @@ const ItemForm = ({ onClose, onSave }) => {
       );
 
       if (response.status === 201) {
-        onSave(response.data);
         onClose();
       }
     } catch (error) {

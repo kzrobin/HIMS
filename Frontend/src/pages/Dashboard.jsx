@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "../components/Layout";
-import ItemTable from "../components/ItemTable";
+import ItemTable from "../components/Item/ItemTable";
 
 const Dashboard = () => {
   return (

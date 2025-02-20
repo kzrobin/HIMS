@@ -9,11 +9,9 @@ const UserProtectedWrapper = ({ children }) => {
   const { user, setUser, backendUrl } = useContext(UserDataContext);
   const [loading, setLoading] = useState(true);
 
-  console.log("outUseeffect", location);
+
   useEffect(() => {
     let isMounted = true;
-
-    console.log("useeffect", location);
     const loadProfile = async () => {
       try {
         axios.defaults.withCredentials = true;
@@ -45,13 +43,10 @@ const UserProtectedWrapper = ({ children }) => {
     );
   }
 
-  console.log("Wrapper Path:", location.pathname);
+
 
   // Redirect logic for protected routes
   if (!user) {
-    console.log("Redirecting to login with state:", {
-      from: location.pathname,
-    });
     navigate("/login", {
       replace: true,
       state: { from: location.pathname }, // Store original request path
