@@ -2,13 +2,12 @@ import React, { useContext, useState } from "react";
 import { UserDataContext } from "../context/UserContext";
 import { Package, Check, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import MultiStepForm from "../components/MultiStepForm";
+import { Footer } from "../components/Footer";
+import { Link } from "react-router-dom";
 
 const Subscription = () => {
   const { user } = useContext(UserDataContext);
   const navigate = useNavigate();
-  const [showMultiStepForm, setShowMultiStepForm] = useState(false);
   console.log(user);
   const features = {
     free: [
@@ -31,15 +30,6 @@ const Subscription = () => {
       "7-day free trial for all premium features",
       "Lifetime access (one-time payment)",
     ],
-  };
-
-  const handleGetPremium = () => {
-    if (!user) {
-      toast("Please login");
-      navigate("/login");
-    } else if (!user.isPremium) {
-      setShowMultiStepForm(true);
-    }
   };
 
   return (
@@ -92,7 +82,7 @@ const Subscription = () => {
               </button>
             </div>
 
-            <div className="p-8 rounded-2xl shadow-lg bg-gradient-to-br from-[#3BCD5B] to-[#1C542A] text-white">
+            <div className="flex flex-col p-8 rounded-2xl shadow-lg bg-gradient-to-br from-[#3BCD5B] to-[#1C542A] text-white">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-3xl font-bold">
                   <div className="flex items-center">
@@ -122,12 +112,12 @@ const Subscription = () => {
                   Already a Premium User
                 </button>
               ) : (
-                <button
-                  onClick={handleGetPremium}
-                  className="w-full bg-white text-[#1C542A] py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors"
+                <Link
+                  to={"/payment"}
+                  className="w-full bg-white text-center text-[#1C542A] py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   Get Premium
-                </button>
+                </Link>
               )}
 
               {!user?.isPremium && (
@@ -140,7 +130,7 @@ const Subscription = () => {
         </div>
       </main>
 
-      {showMultiStepForm && <MultiStepForm />}
+      <Footer show={false} />
     </div>
   );
 };

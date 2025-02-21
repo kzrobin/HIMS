@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import Layout from "../components/Layout";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -9,8 +9,13 @@ import { uploadImageToCloudinary } from "../utils/ImageUpload";
 const EditItem = () => {
   const { itemId } = useParams();
   const { backendUrl, getItems } = useContext(UserDataContext);
+  const location = useLocation();
+  console.log(location);
+  console.log("Previous URL:", location.state?.from);
+  const previousUrl = location.state?.from || "/dashboard";
   const navigate = useNavigate();
 
+  console.log(itemId);
   const [item, setItem] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -199,189 +204,191 @@ const EditItem = () => {
   return (
     <Layout>
       <div className="flex justify-center items-center p-4">
-        <div className="bg-white p-6 rounded-lg w-full max-w-sm max-h-[90vh] my-4 overflow-y-auto custom-scroll">
+        <div className="bg-white p-6 rounded-lg w-full max-w-lg my-4 overflow-y-auto custom-scroll">
           <h2 className="text-2xl font-semibold mb-4">Edit Item</h2>
           <form onSubmit={handleSubmit}>
-            {/* Item Name */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Item Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`mt-1 px-2 py-2 block w-full border ${
-                  errors.name ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                required
-              />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Item Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Item Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={`mt-1 px-2 py-2 block w-full border ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  required
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Category */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className={`mt-1 px-2 py-2 block w-full border ${
+                    errors.category ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  required
+                >
+                  <option value="">Select a category</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Groceries">Groceries</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+                {errors.category && (
+                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                )}
+              </div>
+
+              {/* Store Location */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Store Location
+                </label>
+                <input
+                  type="text"
+                  name="storeLocation"
+                  value={formData.storeLocation}
+                  onChange={handleChange}
+                  className={`mt-1 px-2 py-2 block w-full border ${
+                    errors.storeLocation ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  required
+                />
+                {errors.storeLocation && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.storeLocation}
+                  </p>
+                )}
+              </div>
+
+              {/* Quantity */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className={`mt-1 px-2 py-2 block w-full border ${
+                    errors.quantity ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  min="1"
+                  required
+                />
+                {errors.quantity && (
+                  <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
+                )}
+              </div>
+
+              {/* Purchase Date */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Purchase Date
+                </label>
+                <input
+                  type="date"
+                  name="purchaseDate"
+                  value={formData.purchaseDate}
+                  onChange={handleChange}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Expiry Date */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Expiry Date
+                </label>
+                <input
+                  type="date"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Serial Number */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Serial Number
+                </label>
+                <input
+                  type="text"
+                  name="serialNumber"
+                  value={formData.serialNumber}
+                  onChange={handleChange}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Purchase Location */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Purchase Location
+                </label>
+                <input
+                  type="text"
+                  name="purchaseLocation"
+                  value={formData.purchaseLocation}
+                  onChange={handleChange}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Value */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Value
+                </label>
+                <input
+                  type="number"
+                  name="value"
+                  value={formData.value}
+                  onChange={handleChange}
+                  className={`mt-1 px-2 py-2 block w-full border ${
+                    errors.value ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  min="0"
+                />
+                {errors.value && (
+                  <p className="text-red-500 text-sm mt-1">{errors.value}</p>
+                )}
+              </div>
+
+              {/* Notes - full width */}
+              <div className="mb-4 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Notes
+                </label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
             </div>
 
-            {/* Category */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={`mt-1 px-2 py-2 block w-full border ${
-                  errors.category ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                required
-              >
-                <option value="">Select a category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Furniture">Furniture</option>
-                <option value="Groceries">Groceries</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Other">Other</option>
-              </select>
-              {errors.category && (
-                <p className="text-red-500 text-sm mt-1">{errors.category}</p>
-              )}
-            </div>
-
-            {/* Store Location */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Store Location
-              </label>
-              <input
-                type="text"
-                name="storeLocation"
-                value={formData.storeLocation}
-                onChange={handleChange}
-                className={`mt-1 px-2 py-2 block w-full border ${
-                  errors.storeLocation ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                required
-              />
-              {errors.storeLocation && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.storeLocation}
-                </p>
-              )}
-            </div>
-
-            {/* Quantity */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Quantity
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                className={`mt-1 px-2 py-2 block w-full border ${
-                  errors.quantity ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                min="1"
-                required
-              />
-              {errors.quantity && (
-                <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
-              )}
-            </div>
-
-            {/* Purchase Date */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Purchase Date
-              </label>
-              <input
-                type="date"
-                name="purchaseDate"
-                value={formData.purchaseDate}
-                onChange={handleChange}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-
-            {/* Expiry Date */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Expiry Date
-              </label>
-              <input
-                type="date"
-                name="expiryDate"
-                value={formData.expiryDate}
-                onChange={handleChange}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-
-            {/* Serial Number */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Serial Number
-              </label>
-              <input
-                type="text"
-                name="serialNumber"
-                value={formData.serialNumber}
-                onChange={handleChange}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-
-            {/* Purchase Location */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Purchase Location
-              </label>
-              <input
-                type="text"
-                name="purchaseLocation"
-                value={formData.purchaseLocation}
-                onChange={handleChange}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-
-            {/* Value */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Value
-              </label>
-              <input
-                type="number"
-                name="value"
-                value={formData.value}
-                onChange={handleChange}
-                className={`mt-1 px-2 py-2 block w-full border ${
-                  errors.value ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                min="0"
-              />
-              {errors.value && (
-                <p className="text-red-500 text-sm mt-1">{errors.value}</p>
-              )}
-            </div>
-
-            {/* Notes */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Notes
-              </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-
-            {/* Image Upload */}
-            <div className="mb-4">
+            {/* Image Upload and Preview - full width */}
+            <div className="mb-4 md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
                 Image
               </label>
@@ -394,22 +401,30 @@ const EditItem = () => {
               {errors.image && (
                 <p className="text-red-500 text-sm mt-1">{errors.image}</p>
               )}
-              {imageFile && (
-                <div className="mt-2">
+              <div className="mt-2">
+                {imageFile ? (
                   <img
                     src={URL.createObjectURL(imageFile)}
                     alt="Selected Preview"
                     className="w-24 h-24 object-cover rounded"
                   />
-                </div>
-              )}
+                ) : (
+                  formData.image && (
+                    <img
+                      src={formData.image}
+                      alt="Current"
+                      className="w-24 h-24 object-cover rounded"
+                    />
+                  )
+                )}
+              </div>
             </div>
 
             {/* Buttons */}
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate("/items")}
+                onClick={() => navigate(previousUrl)}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md"
               >
                 Cancel

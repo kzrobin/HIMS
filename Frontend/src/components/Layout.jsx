@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { UserDataContext } from "../context/UserContext";
-import { Package, AlertCircle, Crown } from "lucide-react"; // Import Crown icon for mobile
+import { Package, AlertCircle, Crown, X } from "lucide-react";
 import { motion } from "framer-motion";
 import NotificationBell from "./NotificationBell";
 import SideBar from "./SideBar";
@@ -11,36 +11,54 @@ const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showTrialAlert, setShowTrialAlert] = useState(false);
   const [trialEnded, setTrialEnded] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(null);
 
   useEffect(() => {
     if (user && !user.isPremium) {
       const trialEndDate = new Date(user.trialEndDate);
       const currentDate = new Date();
+      const timeDifference = trialEndDate - currentDate;
 
-      // Check if the trial has ended
-      if (currentDate > trialEndDate) {
+      if (timeDifference <= 0) {
         setTrialEnded(true);
-      }
-
-      // Check if the trial is about to end (within 3 days)
-      if (trialEndDate - currentDate <= 3 * 24 * 60 * 60 * 1000) {
+        setShowTrialAlert(false);
+      } else if (timeDifference <= 3 * 24 * 60 * 60 * 1000) {
         setShowTrialAlert(true);
+        setTrialEnded(false);
+        setRemainingTime(timeDifference);
       }
     }
   }, [user]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+  // Calculate remaining days and hours
+  const remainingHours = Math.floor(remainingTime / (1000 * 60 * 60));
+  const remainingDays = Math.floor(remainingHours / 24);
+  const hoursLeft = remainingHours % 24;
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden relative">
       {/* Trial Ended Alert */}
       {trialEnded && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 flex items-center justify-between" role="alert">
+        <div
+          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 flex items-center justify-between"
+          role="alert"
+        >
           <div>
             <p className="font-bold">Free Trial Ended</p>
-            <p>Your free trial has expired. <Link to="/subscription" className="underline">Upgrade to premium</Link> to continue using our services.</p>
+            <p>
+              Your free trial has expired.{" "}
+              <Link to="/subscription" className="underline">
+                Upgrade to premium
+              </Link>{" "}
+              to continue using our services.
+            </p>
           </div>
-          <button onClick={() => setTrialEnded(false)} className="text-red-700 hover:text-red-900">
+          <button
+            onClick={() => setTrialEnded(false)}
+            className="text-red-700 hover:text-red-900"
+          >
             <X size={20} />
           </button>
         </div>
@@ -48,12 +66,28 @@ const Layout = ({ children }) => {
 
       {/* Trial Expiring Soon Alert */}
       {showTrialAlert && !trialEnded && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 flex items-center justify-between" role="alert">
+        <div
+          className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 flex items-center justify-between"
+          role="alert"
+        >
           <div>
             <p className="font-bold">Free Trial Expiring Soon</p>
-            <p>Your free trial will end in 3 days. <Link to="/subscription" className="underline">Upgrade to premium</Link> to continue enjoying our services.</p>
+            <p>
+              Your free trial will end in{" "}
+              {remainingDays > 0
+                ? `${remainingDays} days and ${hoursLeft} hours`
+                : `${hoursLeft} hours`}
+              .{" "}
+              <Link to="/subscription" className="underline">
+                Upgrade to premium
+              </Link>{" "}
+              to continue enjoying our services.
+            </p>
           </div>
-          <button onClick={() => setShowTrialAlert(false)} className="text-yellow-700 hover:text-yellow-900">
+          <button
+            onClick={() => setShowTrialAlert(false)}
+            className="text-yellow-700 hover:text-yellow-900"
+          >
             <X size={20} />
           </button>
         </div>
@@ -66,9 +100,14 @@ const Layout = ({ children }) => {
         transition={{ duration: 0.5 }}
         className="flex items-center justify-between border py-2 sm:py-4 px-2 sm:px-8"
       >
-        <Link to="/dashboard" className="title flex gap-2 justify-start items-start">
+        <Link
+          to="/dashboard"
+          className="title flex gap-2 justify-start items-start"
+        >
           <Package className="title h-10 w-10 text-[#3BCD5B]" />
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1C542A] hidden sm:block title">Home Inventory</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1C542A] hidden sm:block title">
+            Home Inventory
+          </h1>
         </Link>
         <div className="flex items-center relative">
           {/* Upgrade Plan Button (Desktop) */}
@@ -101,7 +140,9 @@ const Layout = ({ children }) => {
       </motion.div>
 
       {/* Sidebar Overlay */}
-      {isSidebarOpen && <div className="fixed z-10" onClick={toggleSidebar}></div>}
+      {isSidebarOpen && (
+        <div className="fixed z-10" onClick={toggleSidebar}></div>
+      )}
 
       {/* Sidebar */}
       <motion.div

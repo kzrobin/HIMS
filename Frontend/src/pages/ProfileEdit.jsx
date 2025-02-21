@@ -53,8 +53,7 @@ const ProfileEdit = ({ onCancel }) => {
         setPreviewPicture(reader.result);
       };
       reader.readAsDataURL(file);
-
-      // console.log("Image", file);
+      setProfilePictureError(""); // Clear error when a new image is selected
     }
   };
 
@@ -112,6 +111,11 @@ const ProfileEdit = ({ onCancel }) => {
   };
 
   const updateProfilePicture = async () => {
+    if (!previewPicture || previewPicture === user.profilePicture) {
+      setProfilePictureError("Please select an image to upload.");
+      return;
+    }
+
     setIsUpdatingProfilePicture(true);
     try {
       // console.log(previewPicture);
@@ -250,14 +254,14 @@ const ProfileEdit = ({ onCancel }) => {
           )}
 
           {/* Name Section */}
-          <div className="mt-6">
+          <div className=" flex flex-col mt-6">
             <h2 className="text-xl font-semibold text-[#1C542A] mb-4">Name</h2>
             <p className="text-gray-600 font-semibold text-lg">
               {user.fullname.firstname} {user.fullname.lastname}
             </p>
             <button
               onClick={() => setShowEditNameModal(true)}
-              className="bg-gradient-to-r from-[#62b878] via-[#4FCF70] to-[#3BCD5B] text-white px-6 py-2 rounded-lg hover:from-[#3BCD5B] hover:via-[#34D399] hover:to-[#2FAF60] transition-colors mt-2"
+              className="bg-gradient-to-r from-[#62b878] via-[#4FCF70] to-[#3BCD5B] text-white w-fit px-6 py-2 rounded-lg hover:from-[#3BCD5B] hover:via-[#34D399] hover:to-[#2FAF60] transition-colors mt-2"
             >
               Edit Name
             </button>

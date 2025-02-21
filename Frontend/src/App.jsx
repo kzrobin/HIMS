@@ -14,9 +14,9 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ProfileEdit from "./pages/ProfileEdit";
 import Item from "./pages/Item";
 import Test from "./pages/Test";
-import PricingPage from "./pages/PricingPage";
 import Subscription from "./pages/Subscription";
 import EditItem from "./pages/EditItem";
+import Payment from "./pages/Payment";
 
 function App() {
   return (
@@ -41,6 +41,14 @@ function App() {
       />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/test" element={<Test />} />
+      <Route
+        path="/payment"
+        element={
+          <UserProtectedWrapper>
+            <Payment />
+          </UserProtectedWrapper>
+        }
+      />
 
       {/* Protected Routes */}
       <Route

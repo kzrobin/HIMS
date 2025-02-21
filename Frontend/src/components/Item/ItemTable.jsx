@@ -626,7 +626,10 @@ const ItemTable = () => {
                     </td>
                   )}
                   <td className=" flex justify-start items-center gap-3 px-4 py-3">
-                    <Link to={`/item/edit/${item._i}`}>
+                    <Link
+                      to={`/item/edit/${item._id}`}
+                      state={{ from: location.pathname }}
+                    >
                       <PencilOff className="h-5 w-5" />
                     </Link>
                     <Link to={`/item/${item._id}`}>

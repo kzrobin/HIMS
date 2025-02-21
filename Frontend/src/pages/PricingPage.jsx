@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
-import SubscriptionCard from "../components/SubscriptionCard";
 import { Footer } from "../components/Footer";
 
 const PricingPage = () => {

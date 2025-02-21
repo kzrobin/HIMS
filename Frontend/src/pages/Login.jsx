@@ -11,8 +11,6 @@ const Login = () => {
   const location = useLocation();
   const { setUser, backendUrl } = useContext(UserDataContext);
 
-  console.log(location, "Login page");
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -49,7 +47,6 @@ const Login = () => {
     setErrors(validationErrors);
     return isValid;
   };
-  console.log("redic", location.state?.from);
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -61,14 +58,10 @@ const Login = () => {
 
       if (response.status === 200) {
         setUser(response.data.user);
-
-        // Get the original page user requested or fallback to dashboard
         const redirectTo = location.state?.from || "/dashboard";
-        console.log("submit", redirectTo);
         return navigate(redirectTo);
       }
     } catch (error) {
-      console.error("Login Error:", error.response?.data || error.message);
       if (error.response?.status === 401) {
         setErrors({ password: "Invalid email or password" });
       } else if (error.response?.status === 500) {
