@@ -12,11 +12,11 @@ import Report from "./pages/Report";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import ProfileEdit from "./pages/ProfileEdit";
-import Item from "./pages/Item";
+import ItemView from "./pages/ItemView";
 import Test from "./pages/Test";
 import Subscription from "./pages/Subscription";
-import EditItem from "./pages/EditItem";
 import Payment from "./pages/Payment";
+import ItemEdit from "./pages/ItemEdit";
 
 function App() {
   return (
@@ -103,7 +103,7 @@ function App() {
         path="/item/edit/:itemId"
         element={
           <UserProtectedWrapper>
-            <EditItem />
+            <ItemEdit />
           </UserProtectedWrapper>
         }
       />
@@ -111,7 +111,7 @@ function App() {
         path="/item/:itemId"
         element={
           <UserProtectedWrapper>
-            <Item />
+            <ItemView />
           </UserProtectedWrapper>
         }
       />

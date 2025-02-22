@@ -6,12 +6,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { uploadImageToCloudinary } from "../utils/ImageUpload";
 
-const EditItem = () => {
+const ItemEdit = () => {
   const { itemId } = useParams();
   const { backendUrl, getItems } = useContext(UserDataContext);
   const location = useLocation();
-  console.log(location);
-  console.log("Previous URL:", location.state?.from);
   const previousUrl = location.state?.from || "/dashboard";
   const navigate = useNavigate();
 
@@ -67,7 +65,6 @@ const EditItem = () => {
           });
         }
       } catch (error) {
-        console.error("Error fetching item:", error);
         toast.error("Failed to fetch item details.");
       }
     };
@@ -171,7 +168,7 @@ const EditItem = () => {
       if (response.status === 200) {
         toast.success("Item updated successfully");
         getItems();
-        navigate("/items");
+        navigate(previousUrl);
       }
     } catch (error) {
       console.error("Error updating item:", error);
@@ -475,4 +472,4 @@ const EditItem = () => {
   );
 };
 
-export default EditItem;
+export default ItemEdit;

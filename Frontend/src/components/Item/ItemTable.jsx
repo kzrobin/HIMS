@@ -11,6 +11,9 @@ import {
   ChevronsRight,
   View,
   PencilOff,
+  QrCode,
+  Search,
+  X,
 } from "lucide-react";
 import { Tally3, ListFilter } from "lucide-react";
 import ItemForm from "./ItemForm";
@@ -18,6 +21,7 @@ import { UserDataContext } from "../../context/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import DeleteItem from "./DeleteItem";
+import { useBarcodeScanner } from "../../utils/BarCodeScanner";
 
 const ItemTable = () => {
   // User context
@@ -68,6 +72,30 @@ const ItemTable = () => {
 
   // Handle item form
   const [showItemForm, setShowItemForm] = useState(false);
+
+  // Initialize barcode scanner for search
+  const {
+    scannerRef: searchScannerRef,
+    barcode: searchBarcode,
+    scanning: searchScanning,
+    startScanner: searchStartScanner,
+    stopScanner: searchStopScanner,
+  } = useBarcodeScanner();
+  const [searchScanModalOpen, setSearchScanModalOpen] = useState(false);
+
+  // When barcode is detected, update search term and close modal
+  useEffect(() => {
+    if (searchScanModalOpen && searchBarcode) {
+      setSearchTerm(searchBarcode);
+      searchStopScanner();
+      setSearchScanModalOpen(false);
+    }
+  }, [searchBarcode, searchScanModalOpen, searchStopScanner]);
+
+  const openSearchScanModal = () => {
+    setSearchScanModalOpen(true);
+    setTimeout(searchStartScanner, 100);
+  };
 
   // Handle category change
   const handleCategoryChange = (event) => {
@@ -194,15 +222,30 @@ const ItemTable = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="flex-1 flex justify-end items-center">
+        {/* Modified Search Bar */}
+        <div className="flex items-center py-2 px-5 rounded-full bg-white border border-gray-200 w-full sm:w-1/3">
+          {/* Search Icon */}
+          <div className="px-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-500" />
+          </div>
+
+          {/* Search Input */}
           <input
             type="text"
             placeholder="Search items..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="outline-none p-2 rounded bg-white border border-gray-200 w-full sm:w-1/3"
+            className="flex-1 outline-none px-3"
           />
+
+          {/* QR Code Icon */}
+          <button
+            onClick={openSearchScanModal}
+            className="ml-auto px-3 flex items-center"
+            title="Scan Barcode"
+          >
+            <QrCode className="h-5 w-5 text-blue-500" />
+          </button>
         </div>
 
         {/* Filters & Add Button */}
@@ -707,6 +750,31 @@ const ItemTable = () => {
           }}
           deleteItem={deleteItemId}
         />
+      )}
+      {/* Search Scanner Modal */}
+      {searchScanModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white relative p-6 rounded-lg w-full max-w-md shadow-lg">
+            <button
+              onClick={() => {
+                searchStopScanner();
+                setSearchScanModalOpen(false);
+              }}
+              className="absolute top-3 right-3 text-gray-700 hover:text-gray-900 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition z-10"
+              title="Close Scanner"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <div
+              id="scanner"
+              ref={searchScannerRef}
+              className="w-full h-72 sm:h-80 mb-4 rounded-lg"
+            ></div>
+            <p className="text-center text-gray-700 text-sm">
+              Point your camera at a barcode.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

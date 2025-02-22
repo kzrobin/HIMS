@@ -28,7 +28,9 @@ const Logout = () => {
         navigate("/login"); // Navigate to login after successful logout
       } catch (error) {
         toast.error("Log out failed. Please try again");
-        navigate("/dashboard"); // Redirect back to dashboard on failure
+        localStorage.removeItem("token"); // If using token-based auth
+        sessionStorage.clear();
+        navigate("/login"); // Redirect back to dashboard on failure
       }
     };
 

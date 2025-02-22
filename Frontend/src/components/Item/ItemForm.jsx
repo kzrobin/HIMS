@@ -1,10 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { UserDataContext } from "../../context/UserContext";
 import { uploadImageToCloudinary } from "../../utils/ImageUpload";
 import { toast } from "react-toastify";
+import { QrCode, X } from "lucide-react";
+import { useBarcodeScanner } from "../../utils/BarCodeScanner";
 
-const ItemForm = ({ onClose, }) => {
+const ItemForm = ({ onClose }) => {
   const { backendUrl, getItems } = useContext(UserDataContext);
   const [formData, setFormData] = useState({
     name: "",
@@ -25,6 +27,31 @@ const ItemForm = ({ onClose, }) => {
   const [imageFile, setImageFile] = useState(null); // State to hold the selected image file
   const [uploading, setUploading] = useState(false); // State to handle upload loading state
   const [pendingSubmission, setPendingSubmission] = useState(null);
+
+  // Initialize barcode scanner hook for Serial Number scanning
+  const {
+    scannerRef,
+    barcode,
+    scanning,
+    startScanner,
+    setBarcode: setScannedBarcode,
+    stopScanner,
+  } = useBarcodeScanner();
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+
+  // When barcode changes via scanner, update Serial Number field
+  useEffect(() => {
+    if (barcode) {
+      setFormData((prev) => ({ ...prev, serialNumber: barcode }));
+    }
+  }, [barcode]);
+
+  // Auto-close scanner modal once a barcode is detected
+  useEffect(() => {
+    if (scanModalOpen && barcode) {
+      closeScannerModal();
+    }
+  }, [barcode, scanModalOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,6 +187,17 @@ const ItemForm = ({ onClose, }) => {
     await processFormSubmission();
   };
 
+  // New functions for scanner modal
+  const openScannerModal = () => {
+    setScanModalOpen(true);
+    setTimeout(startScanner, 100);
+  };
+
+  const closeScannerModal = () => {
+    stopScanner();
+    setScanModalOpen(false);
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center p-4">
       <div className="bg-white p-6 rounded-lg w-full max-w-sm max-h-[90vh] my-4 overflow-y-auto custom-scroll">
@@ -283,7 +321,7 @@ const ItemForm = ({ onClose, }) => {
           </div>
 
           {/* Serial Number */}
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-sm font-medium text-gray-700">
               Serial Number
             </label>
@@ -292,8 +330,19 @@ const ItemForm = ({ onClose, }) => {
               name="serialNumber"
               value={formData.serialNumber}
               onChange={handleChange}
-              className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 pr-12"
             />
+            <button
+              type="button"
+              onClick={openScannerModal}
+              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              title="Scan Serial Number"
+            >
+              <QrCode className="w-6 h-6 mt-6 text-blue-500" />
+            </button>
+            {errors.serialNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.serialNumber}</p>
+            )}
           </div>
 
           {/* Purchase Location */}
@@ -344,27 +393,6 @@ const ItemForm = ({ onClose, }) => {
           </div>
 
           {/* Image Upload */}
-          {/* <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="mt-1 px-2 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.image && (
-              <p className="text-red-500 text-sm mt-1">{errors.image}</p>
-            )}
-            {imageFile && (
-              <div className="mt-2">
-                <AdvancedImage
-                  cldImg={cld.image(imageFile.name).resize(fill().width(100))}
-                />
-              </div>
-            )}
-          </div> */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Image
@@ -408,6 +436,34 @@ const ItemForm = ({ onClose, }) => {
           </div>
         </form>
       </div>
+
+      {/* Scanner Modal */}
+      {scanModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white relative p-6 rounded-lg w-full max-w-md shadow-lg">
+            {/* Larger Close Button */}
+            <button
+              onClick={closeScannerModal}
+              className="absolute top-3 right-3 text-gray-700 hover:text-gray-900 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition z-10"
+              title="Close Scanner"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            {/* Scanner Area */}
+            <div
+              id="scanner"
+              ref={scannerRef}
+              className="w-full h-72 sm:h-80 mb-4 rounded-lg" // removed border classes here
+            ></div>
+
+            {/* Instruction Text */}
+            <p className="text-center text-gray-700 text-sm">
+              Point your camera at the barcode.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Expiry Warning Popup */}
       {showExpiryWarning && (

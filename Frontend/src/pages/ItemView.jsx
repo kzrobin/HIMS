@@ -5,7 +5,7 @@ import axios from "axios";
 import { UserDataContext } from "../context/UserContext";
 import DeleteItem from "../components/Item/DeleteItem";
 
-const Item = () => {
+const ItemView = () => {
   const { itemId } = useParams();
   const { backendUrl } = useContext(UserDataContext);
   const [item, setItem] = useState(null);
@@ -113,10 +113,9 @@ const Item = () => {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             onClick={() =>
-              navigate(
-                `/item/edit/${item._id}`,
-                (state = { from: location.pathname })
-              )
+              navigate(`/item/edit/${item._id}`, {
+                state: { from: location.pathname },
+              })
             }
             className="bg-blue-500 text-white px-4 py-2 rounded-md"
           >
@@ -141,4 +140,4 @@ const Item = () => {
   );
 };
 
-export default Item;
+export default ItemView;
