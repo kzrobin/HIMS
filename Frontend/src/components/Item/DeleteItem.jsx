@@ -2,10 +2,13 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
 import { UserDataContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const DeleteItem = ({ onCancel, deleteItem }) => {
+const DeleteItem = ({ onCancel, deleteItem, previousUrl = null }) => {
   const { getItems, backendUrl } = useContext(UserDataContext);
   const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
+  console.log(previousUrl);
 
   const handleDeleteClick = async () => {
     setIsDeleting(true); // Start deleting state
@@ -19,6 +22,9 @@ const DeleteItem = ({ onCancel, deleteItem }) => {
       if (res.status === 200) {
         toast.success("Item deleted successfully");
         getItems(); // Fetch updated data only if delete succeeds
+        if (previousUrl) {
+          navigate(previousUrl);
+        }
       }
     } catch (error) {
       console.error(error.response || error);

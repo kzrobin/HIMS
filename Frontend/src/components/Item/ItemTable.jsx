@@ -19,13 +19,15 @@ import { Tally3, ListFilter } from "lucide-react";
 import ItemForm from "./ItemForm";
 import { UserDataContext } from "../../context/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import DeleteItem from "./DeleteItem";
 import { useBarcodeScanner } from "../../utils/BarCodeScanner";
 
 const ItemTable = () => {
+
   // User context
   const { items, getItems } = useContext(UserDataContext);
+  const location = useLocation();
 
   // Column visibility
   const [showColumns, setShowColumns] = useState(false);
@@ -675,7 +677,10 @@ const ItemTable = () => {
                     >
                       <PencilOff className="h-5 w-5" />
                     </Link>
-                    <Link to={`/item/${item._id}`}>
+                    <Link
+                      to={`/item/${item._id}`}
+                      state={{ from: location.pathname }}
+                    >
                       {" "}
                       <View className="h-5 w-5" />
                     </Link>

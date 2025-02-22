@@ -25,7 +25,6 @@ const ItemView = () => {
           setItem(response.data.item);
         }
       } catch (error) {
-        console.error("Error fetching item:", error);
         setError("Failed to fetch item details.");
       } finally {
         setLoading(false);
@@ -134,6 +133,7 @@ const ItemView = () => {
         <DeleteItem
           onCancel={() => setConfirmDelete(false)}
           deleteItem={item._id}
+          previousUrl={location.state?.from}
         />
       )}
     </Layout>
