@@ -19,6 +19,7 @@ const Login = () => {
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    general: "",
   });
 
   const handleForm = (e) => {
@@ -39,10 +40,10 @@ const Login = () => {
       isValid = false;
     }
 
-    if (formData.password.length < 6) {
-      validationErrors.password = "Password must be at least 6 characters.";
-      isValid = false;
-    }
+    // if (formData.password.length < 6) {
+    //   validationErrors.password = "Password must be at least 6 characters.";
+    //   isValid = false;
+    // }
 
     setErrors(validationErrors);
     return isValid;
@@ -62,8 +63,17 @@ const Login = () => {
         return navigate(redirectTo);
       }
     } catch (error) {
-      if (error.response?.status === 401) {
-        setErrors({ password: "Invalid email or password" });
+      if (!error.response) {
+        // No response from backend (network error)
+        setErrors((prev) => ({
+          ...prev,
+          general: "Unable to connect to backend. Please try again later.",
+        }));
+      } else if (error.response?.status === 401) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "Invalid email or password",
+        }));
       } else if (error.response?.status === 500) {
         toast.error("Internal server error. Please try again later.");
       }
@@ -105,7 +115,11 @@ const Login = () => {
           <h2 className="text-3xl font-semibold text-[#1C542A] text-center mb-3">
             Login to Your Account
           </h2>
-
+          {errors.general && (
+            <div className="mb-4 text-center text-red-500 text-sm">
+              {errors.general}
+            </div>
+          )}
           {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">

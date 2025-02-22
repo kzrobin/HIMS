@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserProtectedWrapper = ({ children }) => {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const UserProtectedWrapper = ({ children }) => {
       replace: true,
       state: { from: location.pathname }, // Store original request path
     });
+
     return null;
   }
 

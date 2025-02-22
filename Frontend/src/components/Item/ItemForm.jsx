@@ -164,7 +164,7 @@ const ItemForm = ({ onClose }) => {
       toast.success("Item added successfully");
       getItems();
       setUploading(false);
-      setPendingSubmission(null); // Clear pending submission
+      setPendingSubmission(null);
     }
   };
 

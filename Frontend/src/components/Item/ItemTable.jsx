@@ -24,7 +24,6 @@ import DeleteItem from "./DeleteItem";
 import { useBarcodeScanner } from "../../utils/BarCodeScanner";
 
 const ItemTable = () => {
-
   // User context
   const { items, getItems } = useContext(UserDataContext);
   const location = useLocation();
@@ -225,9 +224,9 @@ const ItemTable = () => {
         </div>
 
         {/* Modified Search Bar */}
-        <div className="flex items-center py-2 px-5 rounded-full bg-white border border-gray-200 w-full sm:w-1/3">
+        <div className="flex items-center px-6 py-1 sm:px-8 sm:py-2 rounded-full bg-white border border-gray-200 w-full sm:w-1/3 overflow-hidden">
           {/* Search Icon */}
-          <div className="px-3 flex items-center pointer-events-none">
+          <div className="flex-shrink-0">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
 
@@ -237,13 +236,13 @@ const ItemTable = () => {
             placeholder="Search items..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="flex-1 outline-none px-3"
+            className="flex-1 min-w-0 outline-none px-2 sm:px-3"
           />
 
           {/* QR Code Icon */}
           <button
             onClick={openSearchScanModal}
-            className="ml-auto px-3 flex items-center"
+            className="flex-shrink-0 flex items-center"
             title="Scan Barcode"
           >
             <QrCode className="h-5 w-5 text-blue-500" />

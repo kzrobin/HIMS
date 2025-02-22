@@ -102,7 +102,7 @@ const Payment = () => {
         { withCredentials: true }
       );
 
-      if (res.status == 200) {
+      if (response.status == 200) {
         toast.success(
           "Payment Successful! 🎉 Thank you for subscribing to Premium. Enjoy exclusive features and benefits!"
         );
