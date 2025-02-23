@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   BarChart2,
   TrendingUp,
@@ -7,15 +7,13 @@ import {
   Tag,
   Map,
   Settings,
-  Users,
   Download,
-  Upload,
 } from "lucide-react";
 import { UserDataContext } from "../context/UserContext";
 import Layout from "../components/Layout";
 
 const ItemReport = () => {
-  const { user, items } = useContext(UserDataContext);
+  const { user, items, getItems } = useContext(UserDataContext);
   const totalValue = items.reduce((sum, item) => sum + (item.value || 0), 0);
   const totalItems = items.length;
   const expiringItems = items.filter((item) => {
@@ -81,6 +79,9 @@ const ItemReport = () => {
     URL.revokeObjectURL(url);
   };
 
+  useEffect(() => {
+    getItems();
+  }, []);
   return (
     <Layout>
       <div className="space-y-6 mt-6 sm:mt-8">

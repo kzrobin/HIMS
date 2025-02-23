@@ -36,7 +36,17 @@ const ItemView = () => {
 
   if (loading) return <Layout>Loading...</Layout>;
   // if (error) return <Layout>{error}</Layout>;
-  if (!item) return <Layout>Item not found.</Layout>;
+  if (!item)
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <h2 className="text-2xl font-bold text-gray-800">Item Not Found</h2>
+          <p className="mt-4 text-lg text-gray-600 text-center">
+            The item you are looking for does not exist or has been removed.
+          </p>
+        </div>
+      </Layout>
+    );
 
   // Additional details (excluding Name, Category and Expiry Date)
   const additionalRows = [

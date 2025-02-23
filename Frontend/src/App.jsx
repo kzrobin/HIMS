@@ -17,6 +17,7 @@ import Test from "./pages/Test";
 import Subscription from "./pages/Subscription";
 import Payment from "./pages/Payment";
 import ItemEdit from "./pages/ItemEdit";
+import ReportExpairy from "./pages/Reports/ReportExpairy";
 
 function App() {
   return (
@@ -96,6 +97,14 @@ function App() {
         element={
           <UserProtectedWrapper>
             <Report />
+          </UserProtectedWrapper>
+        }
+      />
+      <Route
+        path="/report-expiry"
+        element={
+          <UserProtectedWrapper>
+            <ReportExpairy />
           </UserProtectedWrapper>
         }
       />
