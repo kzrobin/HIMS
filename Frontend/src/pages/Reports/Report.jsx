@@ -215,3 +215,5 @@ export const Report = () => {
     </Layout>
   );
 };
+
+export default Report;
