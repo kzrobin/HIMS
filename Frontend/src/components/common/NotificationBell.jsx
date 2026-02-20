@@ -75,6 +75,7 @@ const NotificationBell = () => {
             {notifications.length > 0 ? (
               notifications.map((n) => (
                 <Link
+                key={n.id}
                   to={`/item/${n.id}`}
                   state={{ from: location.pathname }}
                   className="flex items-start px-4 py-3 border-b hover:bg-gray-50 transition-colors"

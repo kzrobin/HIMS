@@ -6,737 +6,161 @@
 
 **URL:** `/users/register`
 
-**Method:** `POST`
-
-**Request Body:**
-
-```json
-{
-  "fullname": {
-    "firstname": "John",
-    "lastname": "Doe"
-  },
-  "email": "john.doe@example.com",
-  "password": "password123"
-}
-```
-
-**Validations:**
-
-- `firstname`: Must be at least 2 characters long.
-- `lastname`: Must be at least 3 characters long.
-- `email`: Must be a valid email address.
-- `password`: Must be at least 6 characters long.
-
-**Success Response:**
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": false,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
-
-**Status Code:** `201 Created`
-
-**Error Responses:**
-
-- **Validation Error:**
-
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid Email",
-        "param": "email",
-        "location": "body"
-      }
-    ],
-    "message": "Data validation error"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **Email Exists:**
-
-  ```json
-  {
-    "message": "Email already exists"
-  }
-  ```
-
-  **Status Code:** `409 Conflict`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Login a user
-
-**URL:** `/users/login`
-
-**Method:** `POST`
-
-**Request Body:**
-
-```json
-{
-  "email": "john.doe@example.com",
-  "password": "password123"
-}
-```
-
-**Validations:**
-
-- `email`: Must be a valid email address.
-- `password`: Must be at least 6 characters long.
-
-**Success Response:**
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": false,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **Validation Error:**
-
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "invalid email or password",
-        "param": "email",
-        "location": "body"
-      }
-    ],
-    "message": "Data validation error"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **Invalid Credentials:**
-
-  ```json
-  {
-    "message": "Invalid email or password"
-  }
-  ```
-
-  **Status Code:** `401 Unauthorized`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Get user profile
-
-**URL:** `/users/profile`
-
-**Method:** `GET`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": false,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
+# HIMS API Documentation
 
-**Status Code:** `200 OK`
-
-**Error Responses:**
+## User Endpoints
 
-- **Unauthorized:**
+### Register User
 
-  ```json
-  {
-    "message": "Unauthorized access"
-  }
-  ```
+- **POST** `/users/register`
+- **Body:** `{ fullname: { firstname, lastname }, email, password }`
+- **Validations:** firstname: min 2 chars, lastname: min 3 chars, email: valid format, password: min 6 chars
+- **Success:** `201 Created` `{ token, user }`
+- **Errors:** `400 Bad Request` (validation), `409 Conflict` (email exists), `500 Internal Server Error`
 
-  **Status Code:** `401 Unauthorized`
+---
 
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Logout a user
-
-**URL:** `/users/logout`
-
-**Method:** `POST`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Logout Successfully"
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **Unauthorized:**
-
-  ```json
-  {
-    "message": "Unauthorized access"
-  }
-  ```
-
-  **Status Code:** `401 Unauthorized`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Send verification OTP
-
-**URL:** `/users/verify/send-otp`
-
-**Method:** `POST`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Verification OTP has been sent on Email"
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **User Not Found:**
-
-  ```json
-  {
-    "message": "User doesn't exist"
-  }
-  ```
-
-  **Status Code:** `404 Not Found`
-
-- **User Already Verified:**
-
-  ```json
-  {
-    "message": "User already verified"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
+### Login User
+
+- **POST** `/users/login`
+- **Body:** `{ email, password }`
+- **Validations:** email: valid format, password: min 6 chars
+- **Success:** `200 OK` `{ token, user }`
+- **Errors:** `400 Bad Request` (validation), `401 Unauthorized` (invalid credentials), `500 Internal Server Error`
+
+---
+
+### Get User Profile
+
+- **GET** `/users/profile`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `{ user }`
+- **Errors:** `401 Unauthorized`, `500 Internal Server Error`
+
+---
+
+### Logout User
+
+- **POST** `/users/logout`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `{ message: "Logout Successfully" }`
+- **Errors:** `401 Unauthorized`, `500 Internal Server Error`
+
+---
+
+### Send Verification OTP
+
+- **POST** `/users/verify/send-otp`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `{ message: "Verification OTP has been sent on Email" }`
+- **Errors:** `404 Not Found` (user), `400 Bad Request` (already verified), `500 Internal Server Error`
+
+---
 
 ### Verify OTP
 
-**URL:** `/users/verify`
+- **POST** `/users/verify`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ otp }`
+- **Success:** `200 OK` `{ message: "Account successfully verified" }`
+- **Errors:** `400 Bad Request` (invalid/expired OTP), `500 Internal Server Error`
 
-**Method:** `POST`
+---
 
-**Headers:**
+### Send Reset Password OTP
 
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
+- **POST** `/users/reset-password/send-otp`
+- **Body:** `{ email }`
+- **Success:** `200 OK` `{ message: "OTP has been sent to your email address" }`
+- **Errors:** `404 Not Found` (user), `500 Internal Server Error`
 
-**Request Body:**
+---
 
-```json
-{
-  "otp": "123456"
-}
-```
+### Reset Password
 
-**Success Response:**
+- **PUT** `/users/reset-password`
+- **Body:** `{ email, otp, newPassword }`
+- **Success:** `200 OK` `{ message: "Password changed successfully" }`
+- **Errors:** `400 Bad Request` (invalid/expired OTP), `500 Internal Server Error`
 
-```json
-{
-  "message": "Account successfully verified"
-}
-```
+---
 
-**Status Code:** `200 OK`
+### Update Name
 
-**Error Responses:**
+- **PUT** `/users/update-name`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ fullname }`
+- **Success:** `200 OK` `{ message: "Name updated successfully", user }`
+- **Errors:** `404 Not Found` (user), `500 Internal Server Error`
 
-- **Invalid OTP:**
+---
 
-  ```json
-  {
-    "message": "Invalid OTP"
-  }
-  ```
+### Update Profile Picture
 
-  **Status Code:** `400 Bad Request`
+- **PUT** `/users/update-profile-picture`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ profilePicture }`
+- **Success:** `200 OK` `{ message: "Profile picture updated successfully", user }`
+- **Errors:** `404 Not Found` (user), `403 Forbidden` (not premium), `500 Internal Server Error`
 
-- **OTP Expired:**
+---
 
-  ```json
-  {
-    "message": "OTP Expired"
-  }
-  ```
+### Update Password
 
-  **Status Code:** `400 Bad Request`
+- **PUT** `/users/update-password`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ oldPassword, newPassword }`
+- **Success:** `200 OK` `{ message: "Password updated successfully" }`
+- **Errors:** `400 Bad Request` (incorrect old password), `500 Internal Server Error`
 
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
+---
 
-### Send reset password OTP
+## Item Endpoints
 
-**URL:** `/users/reset-password/send-otp`
+### Add Item
 
-**Method:** `POST`
+- **POST** `/items/add`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ name, category, storeLocation, quantity, purchaseDate, expiryDate, serialNumber, purchaseLocation, value, notes, image }`
+- **Success:** `201 Created` `{ item }`
+- **Errors:** `401 Unauthorized`, `400 Bad Request`, `500 Internal Server Error`
 
-**Request Body:**
+---
 
-```json
-{
-  "email": "john.doe@example.com"
-}
-```
+### Update Item
 
-**Success Response:**
+- **PUT** `/items/update/:itemId`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** `{ ...fields to update }`
+- **Success:** `200 OK` `{ item }`
+- **Errors:** `401 Unauthorized`, `404 Not Found`, `400 Bad Request`, `500 Internal Server Error`
 
-```json
-{
-  "message": "OTP has been sent to your email address"
-}
-```
+---
 
-**Status Code:** `200 OK`
+### Delete Item
 
-**Error Responses:**
+- **DELETE** `/items/delete/:itemId`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `{ message: "Item deleted successfully" }`
+- **Errors:** `401 Unauthorized`, `404 Not Found`, `500 Internal Server Error`
 
-- **User Not Found:**
+---
 
-  ```json
-  {
-    "message": "User not found"
-  }
-  ```
+### Get All Items
 
-  **Status Code:** `404 Not Found`
+- **GET** `/items`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `[ item, ... ]`
+- **Errors:** `401 Unauthorized`, `500 Internal Server Error`
 
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Reset password
-
-**URL:** `/users/reset-password`
-
-**Method:** `PUT`
+---
 
-**Request Body:**
+### Get Item
 
-```json
-{
-  "email": "john.doe@example.com",
-  "otp": "123456",
-  "newPassword": "newpassword123"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Password changed successfully"
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **Invalid OTP:**
-
-  ```json
-  {
-    "message": "Invalid OTP"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **OTP Expired:**
-
-  ```json
-  {
-    "message": "OTP expired"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Update name
-
-**URL:** `/users/update-name`
-
-**Method:** `PUT`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Request Body:**
-
-```json
-{
-  "fullname": {
-    "firstname": "John",
-    "lastname": "Doe"
-  }
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Name updated successfully",
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": false,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **User Not Found:**
-
-  ```json
-  {
-    "message": "User not found"
-  }
-  ```
-
-  **Status Code:** `404 Not Found`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Update profile picture
-
-**URL:** `/users/update-profile-picture`
-
-**Method:** `PUT`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Request Body:**
-
-```json
-{
-  "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Profile picture updated successfully",
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": false,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **User Not Found:**
-
-  ```json
-  {
-    "message": "User not found"
-  }
-  ```
-
-  **Status Code:** `404 Not Found`
-
-- **Not Premium:**
-
-  ```json
-  {
-    "message": "You must be a premium member to update your profile picture"
-  }
-  ```
-
-  **Status Code:** `403 Forbidden`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Update password
-
-**URL:** `/users/update-password`
-
-**Method:** `PUT`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Request Body:**
-
-```json
-{
-  "oldPassword": "oldpassword123",
-  "newPassword": "newpassword123"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Password updated successfully"
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **Incorrect Old Password:**
-
-  ```json
-  {
-    "message": "Incorrect old password"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
-
-- **Internal Server Error:**
-  ```json
-  {
-    "message": "Internal server error",
-    "error": "Error message"
-  }
-  ```
-  **Status Code:** `500 Internal Server Error`
-
-### Subscribe to premium plan
-
-**URL:** `/users/subscribe-premium`
-
-**Method:** `PUT`
-
-**Headers:**
-
-```json
-{
-  "Authorization": "Bearer <token>"
-}
-```
-
-**Success Response:**
-
-```json
-{
-  "message": "Subscription successful. You are now a premium user",
-  "user": {
-    "_id": "60c72b2f9b1d4c3a88e4f8b9",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "isPremium": true,
-    "isAccountVerified": false,
-    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgH..."
-  }
-}
-```
-
-**Status Code:** `200 OK`
-
-**Error Responses:**
-
-- **User Not Found:**
-
-  ```json
-  {
-    "message": "User not found"
-  }
-  ```
-
-  **Status Code:** `404 Not Found`
-
-- **Already Premium:**
-
-  ```json
-  {
-    "message": "You are already a premium user"
-  }
-  ```
-
-  **Status Code:** `400 Bad Request`
+- **GET** `/items/:itemId`
+- **Headers:** `Authorization: Bearer <token>`
+- **Success:** `200 OK` `{ item }`
+- **Errors:** `404 Not Found`, `400 Bad Request`, `500 Internal Server Error`
 
 - **Internal Server Error:**
   ```json

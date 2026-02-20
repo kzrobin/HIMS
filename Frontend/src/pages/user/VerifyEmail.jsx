@@ -9,6 +9,7 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const { backendUrl, user, getUser } = useContext(UserDataContext);
   const inputRefs = useRef([]);
+  const [getOTP, setGeOTP] = useState(true);
   const [isResendDisabled, setIsResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(30);
 
@@ -64,8 +65,9 @@ const VerifyEmail = () => {
   };
 
   // Resend OTP
-  const resendOTP = async () => {
+  const sendOTP = async () => {
     try {
+      
       setIsResendDisabled(true);
       setCountdown(30); // Reset countdown
 
@@ -80,7 +82,8 @@ const VerifyEmail = () => {
       );
 
       if (response.status == 200) {
-        toast.success("OTP successfully!");
+        toast.success("OTP send successfully!");
+        setGeOTP(false);
       } else {
         toast.error(response.data.message);
       }
@@ -111,8 +114,6 @@ const VerifyEmail = () => {
     if (user.isAccountVerified) {
       toast("User is already verified");
       navigate("/dashboard");
-    } else {
-      resendOTP();
     }
   }, []);
 
@@ -148,21 +149,28 @@ const VerifyEmail = () => {
         </div>
 
         {/* Verify Button */}
-        <button
-          type="submit"
-          className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#3BCD5B] to-[#2E8B57] text-white font-medium hover:bg-gradient-to-r hover:from-[#2E8B57] hover:to-[#3BCD5B] transition-all mb-4"
-        >
-          Verify Email
-        </button>
+
+        {!getOTP && (
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#3BCD5B] to-[#2E8B57] text-white font-medium hover:bg-gradient-to-r hover:from-[#2E8B57] hover:to-[#3BCD5B] transition-all mb-4"
+          >
+            Verify Email
+          </button>
+        )}
 
         {/* Resend OTP Button */}
         <button
           type="button"
-          onClick={resendOTP}
+          onClick={sendOTP}
           disabled={isResendDisabled}
           className="w-full py-2.5 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-all mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isResendDisabled ? `Resend OTP in ${countdown}s` : "Resend OTP"}
+          {getOTP
+            ? "Send OTP"
+            : isResendDisabled
+              ? `Resend OTP in ${countdown}s`
+              : "Resend OTP"}
         </button>
 
         {/* Cancel Button */}

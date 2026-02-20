@@ -109,7 +109,7 @@ const Signup = () => {
         navigate(redirectTo);
       }
     } catch (error) {
-      console.error("Signup Error:", error.response?.data || error.message);
+      // console.error("Signup Error:", error.response?.data || error.message);
       if (!error.response) {
         setErrors((prev) => ({
           ...prev,

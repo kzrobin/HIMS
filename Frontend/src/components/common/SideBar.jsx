@@ -35,7 +35,7 @@ const SideBar = ({ closeSidebar }) => {
       setUser(null); // Clear user context
       navigate("/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      // console.error("Logout failed:", error);
       navigate("/login"); // Proceed anyway if error occurs
     }
   };

@@ -13,7 +13,7 @@ const ItemEdit = () => {
   const previousUrl = location.state?.from || "/dashboard";
   const navigate = useNavigate();
 
-  console.log(itemId);
+  // console.log(itemId);
   const [item, setItem] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -171,7 +171,7 @@ const ItemEdit = () => {
         navigate(previousUrl);
       }
     } catch (error) {
-      console.error("Error updating item:", error);
+      // console.error("Error updating item:", error);
       toast.error("Failed to update item");
     } finally {
       setUploading(false);

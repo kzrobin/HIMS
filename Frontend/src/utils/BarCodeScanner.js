@@ -40,7 +40,7 @@ export const useBarcodeScanner = () => {
       },
       (err) => {
         if (err) {
-          console.error("Quagga initialization failed:", err);
+          // console.error("Quagga initialization failed:", err);
           setScanning(false);
           return;
         }
