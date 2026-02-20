@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { UserDataContext } from "../context/UserContext";
 import Layout from "../components/Layout";
+import { Link } from "react-router-dom";
 
 const ItemReport = () => {
   const { user, items, getItems } = useContext(UserDataContext);
@@ -121,7 +122,7 @@ const ItemReport = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <Link to={"/report-expiry"} className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
                 Expiring Soon
@@ -129,7 +130,7 @@ const ItemReport = () => {
               <Clock className="h-6 w-6 text-red-600" />
             </div>
             <p className="text-3xl font-bold text-gray-900">{expiringItems}</p>
-          </div>
+          </Link>
         </div>
 
         {/* Advanced Features Grid */}

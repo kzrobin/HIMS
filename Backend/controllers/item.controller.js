@@ -29,6 +29,16 @@ module.exports.addItem = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(fullUser.isTrialActive());
+
+    // New check: if user is neither on trial nor premium, send error
+    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
+      return res.status(403).json({
+        message:
+          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
+      });
+    }
+
     // Check if the trial is active or if the user is premium
     if (!fullUser.isTrialActive() && !fullUser.isPremium) {
       return res.status(403).json({
@@ -97,6 +107,14 @@ module.exports.updateItem = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // New check for updateItem:
+    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
+      return res.status(403).json({
+        message:
+          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
+      });
+    }
+
     // Check if the trial is active or if the user is premium
     if (!fullUser.isTrialActive() && !fullUser.isPremium) {
       return res.status(403).json({
@@ -144,6 +162,14 @@ module.exports.deleteItem = async (req, res) => {
     const fullUser = await userModel.findById(user._id);
     if (!fullUser) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // New check for deleteItem:
+    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
+      return res.status(403).json({
+        message:
+          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
+      });
     }
 
     // Check if the trial is active or if the user is premium

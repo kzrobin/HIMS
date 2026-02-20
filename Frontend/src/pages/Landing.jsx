@@ -9,183 +9,206 @@ import {
   Search,
   Shield,
   BarChart,
+  Home,
 } from "lucide-react";
 
 const Landing = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col overflow-x-hidden bg-[#F9FAF5]">
       <main className="flex-grow">
         {/* Free Trial Banner */}
-        <div className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white text-center py-3">
+        <div className="bg-[#8B7E66] text-white text-center py-3 sm:py-4 sticky top-0 z-10">
           <p className="text-lg font-semibold">
             🎉 Start your <strong>7-day free trial</strong> today! No credit
             card required. 🎉
           </p>
         </div>
 
-        {/* Hero Section with Wave Background */}
+        {/* Hero Section */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="bg-gradient-to-br from-[#3BCD5B] via-[#2E8B57] to-[#3BCD5B] text-white pb-24 w-full relative overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="bg-gradient-to-br from-[#A3B18A] to-[#588157] text-white pt-8 sm:pt-12 pb-16 sm:pb-24 relative"
         >
-          {/* Wave Background */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-full h-24 sm:h-32 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10"></div>
 
-          <nav>
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <div className="flex justify-between items-center">
-                {/* Logo and Title */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="flex items-center space-x-3"
-                >
-                  <Package className="h-10 w-10 text-white" />
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">
-                    Home Inventory
-                  </h1>
-                </motion.div>
-
-                {/* Navbar Links and Buttons */}
-                <div className="flex items-center space-x-6">
-                  <Link to="/login">
-                    <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all">
-                      Login
-                    </button>
-                  </Link>
-                  <Link to="/signup" className="hidden md:block">
-                    <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all text-nowrap">
-                      Sign Up
-                    </button>
-                  </Link>
-                </div>
+          <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+              <motion.div
+                initial={{ x: -20 }}
+                animate={{ x: 0 }}
+                className="flex items-center space-x-3"
+              >
+                <Home className="h-8 w-8 sm:h-10 sm:w-10 text-[#F9FAF5]" />
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                  HomeHaven
+                </h1>
+              </motion.div>
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <Link to="/login">
+                  <button className="px-4 py-2 sm:px-6 sm:py-2 text-[#588157] bg-white rounded-lg hover:bg-[#DAD7CD] transition-all duration-300 text-sm sm:text-base">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/signup">
+                  <button className="px-4 py-2 sm:px-6 sm:py-2 bg-[#8B7E66] text-white rounded-lg hover:bg-[#6B6651] transition-all duration-300 text-sm sm:text-base">
+                    Get Started
+                  </button>
+                </Link>
               </div>
             </div>
           </nav>
 
-          {/* Horizontal Line */}
-          <hr className="border-t-2 border-gray-300 mx-4 sm:mx-16" />
-
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">
-              Smart Home Inventory Management
-            </h2>
-            <p className="text-xl md:text-2xl mb-8 text-indigo-100 max-w-3xl mx-auto">
-              Keep track of everything in your home effortlessly. Start your{" "}
-              <strong>7-day free trial</strong> today!
+          <div className="container mx-auto px-4 text-center mt-8 sm:mt-12">
+            <motion.h2
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
+            >
+              Your Home, Perfectly Organized
+            </motion.h2>
+            <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-xl sm:max-w-2xl mx-auto">
+              Manage your household items with ease. Track, organize, and never
+              lose anything again.
             </p>
             <Link to="/signup">
-              <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
-                Start Free Trial
-              </button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 sm:px-8 sm:py-4 bg-[#8B7E66] text-white rounded-xl shadow-lg hover:bg-[#6B6651] transition-all duration-300 text-sm sm:text-base"
+              >
+                Try Free for 7 Days
+              </motion.button>
             </Link>
           </div>
         </motion.div>
 
         {/* Features Section */}
-        <section className="py-24 bg-gray-50 relative">
-          {/* Wave Background */}
-          <div className="absolute top-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20 transform rotate-180"></div>
-
+        <section className="py-12 sm:py-20 bg-white relative">
           <div className="container mx-auto px-4">
-            <h3 className="text-3xl font-bold text-center mb-16">
-              Powerful Features for Your Home
+            <h3 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 text-[#344E41]">
+              Everything You Need to Stay Organized
             </h3>
-            <div className="grid md:grid-cols-3 gap-12">
-              <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
-                <List className="h-12 w-12 text-[#4F46E5] mb-6" />
-                <h4 className="text-xl font-semibold mb-4">
-                  Smart Organization
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8"
+            >
+              <motion.div
+                variants={itemVariants}
+                className="bg-[#F9FAF5] p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                <List className="h-10 w-10 sm:h-12 sm:w-12 text-[#588157] mb-3 sm:mb-4" />
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-[#344E41]">
+                  Easy Cataloging
                 </h4>
-                <p className="text-gray-600">
-                  Categorize and organize your items efficiently with our
-                  intuitive system.
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Add and categorize your items with a simple, intuitive
+                  interface.
                 </p>
-              </div>
-              <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
-                <Calendar className="h-12 w-12 text-[#4F46E5] mb-6" />
-                <h4 className="text-xl font-semibold mb-4">Expiry Tracking</h4>
-                <p className="text-gray-600">
-                  Never let items expire again. Get notifications before your
-                  items reach their expiry date.
+              </motion.div>
+              <motion.div
+                variants={itemVariants}
+                className="bg-[#F9FAF5] p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-[#588157] mb-3 sm:mb-4" />
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-[#344E41]">
+                  Smart Reminders
+                </h4>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Get alerts for expiring warranties or maintenance schedules.
                 </p>
-              </div>
-              <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
-                <Search className="h-12 w-12 text-[#4F46E5] mb-6" />
-                <h4 className="text-xl font-semibold mb-4">Quick Search</h4>
-                <p className="text-gray-600">
-                  Find any item instantly with our powerful search
-                  functionality.
+              </motion.div>
+              <motion.div
+                variants={itemVariants}
+                className="bg-[#F9FAF5] p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                <Search className="h-10 w-10 sm:h-12 sm:w-12 text-[#588157] mb-3 sm:mb-4" />
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-[#344E41]">
+                  Instant Search
+                </h4>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Find anything in seconds with powerful search tools.
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
-        {/* Free Trial Explanation Section */}
-        <section className="py-24 bg-white relative">
+        {/* Interactive Demo Section */}
+        <section className="py-12 sm:py-20 bg-[#DAD7CD] relative">
           <div className="container mx-auto px-4 text-center">
-            <h3 className="text-3xl font-bold mb-4">
-              Try Home Inventory for Free
+            <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#344E41]">
+              See It In Action
             </h3>
-            <p className="text-xl text-gray-600 mb-8">
-              Experience all the features of Home Inventory with our{" "}
-              <strong>7-day free trial</strong>. No credit card required!
+            <p className="text-base sm:text-lg text-gray-700 mb-6 sm:mb-8 max-w-xl sm:max-w-2xl mx-auto">
+              Explore how HomeHaven transforms your home management with our
+              interactive demo.
             </p>
-            <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
-              <div className="bg-gray-50 p-8 rounded-xl shadow-md">
-                <h4 className="text-xl font-semibold mb-4">What's Included</h4>
-                <ul className="text-gray-600 text-left list-disc list-inside">
-                  <li>Full access to all features</li>
-                  <li>Unlimited item tracking</li>
-                  <li>Advanced analytics and reports</li>
-                  <li>Priority customer support</li>
-                </ul>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-md sm:max-w-3xl mx-auto"
+            >
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link to="/login?next=/dashboard">
+                  <button className="px-4 py-2 sm:px-6 sm:py-2 bg-[#588157] text-white rounded-lg hover:bg-[#344E41] transition-all text-sm sm:text-base">
+                    Add Item
+                  </button>
+                </Link>
+                <Link to="/login?next=/dashboard">
+                  <button className="px-4 py-2 sm:px-6 sm:py-2 border border-[#588157] text-[#588157] rounded-lg hover:bg-[#588157] hover:text-white transition-all text-sm sm:text-base">
+                    Search Inventory
+                  </button>
+                </Link>
               </div>
-              <div className="bg-gray-50 p-8 rounded-xl shadow-md">
-                <h4 className="text-xl font-semibold mb-4">How It Works</h4>
-                <ul className="text-gray-600 text-left list-disc list-inside">
-                  <li>Sign up in seconds</li>
-                  <li>Start organizing immediately</li>
-                  <li>Cancel anytime during the trial</li>
-                  <li>No hidden fees</li>
-                </ul>
-              </div>
-            </div>
-            <Link to="/signup" className="mt-12 inline-block">
-              <button className="text-lg px-8 py-4 bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
-                Start Free Trial
-              </button>
-            </Link>
+            </motion.div>
           </div>
         </section>
 
-        {/* Call to Action Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white py-16 relative"
-        >
-          {/* Wave Background */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20 transform rotate-180"></div>
-
+        {/* CTA Section */}
+        <section className="py-12 sm:py-20 bg-gradient-to-br from-[#A3B18A] to-[#588157] text-white relative">
           <div className="container mx-auto px-4 text-center">
-            <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
-            <p className="text-xl mb-8">
-              Join thousands of organized households today. Start your{" "}
-              <strong>7-day free trial</strong> now!
+            <motion.h3
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6"
+            >
+              Take Control of Your Home Today
+            </motion.h3>
+            <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-md sm:max-w-xl mx-auto">
+              Join thousands of happy homeowners. Start your free trial with no
+              commitment!
             </p>
             <Link to="/signup">
-              <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
-                Create new account
-              </button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 sm:px-8 sm:py-4 bg-[#8B7E66] text-white rounded-xl shadow-lg hover:bg-[#6B6651] transition-all duration-300 text-sm sm:text-base"
+              >
+                Start Free Trial
+              </motion.button>
             </Link>
           </div>
-        </motion.div>
+        </section>
       </main>
 
       <Footer />
@@ -194,3 +217,200 @@ const Landing = () => {
 };
 
 export default Landing;
+
+// import React from "react";
+// import { Link } from "react-router-dom";
+// import { motion } from "framer-motion";
+// import { Footer } from "../components/Footer";
+// import {
+//   Package,
+//   List,
+//   Calendar,
+//   Search,
+//   Shield,
+//   BarChart,
+// } from "lucide-react";
+
+// const Landing = () => {
+//   return (
+//     <div className="min-h-screen flex flex-col overflow-x-hidden">
+//       <main className="flex-grow">
+//         {/* Free Trial Banner */}
+//         <div className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white text-center py-3">
+//           <p className="text-lg font-semibold">
+//             🎉 Start your <strong>7-day free trial</strong> today! No credit
+//             card required. 🎉
+//           </p>
+//         </div>
+
+//         {/* Hero Section with Wave Background */}
+//         <motion.div
+//           initial={{ opacity: 0, scale: 0.9 }}
+//           animate={{ opacity: 1, scale: 1 }}
+//           transition={{ duration: 0.6 }}
+//           className="bg-gradient-to-br from-[#3BCD5B] via-[#2E8B57] to-[#3BCD5B] text-white pb-24 w-full relative overflow-hidden"
+//         >
+//           {/* Wave Background */}
+//           <div className="absolute bottom-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20"></div>
+
+//           <nav>
+//             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+//               <div className="flex justify-between items-center">
+//                 {/* Logo and Title */}
+//                 <motion.div
+//                   initial={{ opacity: 0, y: -10 }}
+//                   animate={{ opacity: 1, y: 0 }}
+//                   transition={{ duration: 0.5 }}
+//                   className="flex items-center space-x-3"
+//                 >
+//                   <Package className="h-10 w-10 text-white" />
+//                   <h1 className="text-2xl md:text-3xl font-bold text-white">
+//                     Home Inventory
+//                   </h1>
+//                 </motion.div>
+
+//                 {/* Navbar Links and Buttons */}
+//                 <div className="flex items-center space-x-6">
+//                   <Link to="/login">
+//                     <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all">
+//                       Login
+//                     </button>
+//                   </Link>
+//                   <Link to="/signup" className="hidden md:block">
+//                     <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all text-nowrap">
+//                       Sign Up
+//                     </button>
+//                   </Link>
+//                 </div>
+//               </div>
+//             </div>
+//           </nav>
+
+//           {/* Horizontal Line */}
+//           <hr className="border-t-2 border-gray-300 mx-4 sm:mx-16" />
+
+//           <div className="container mx-auto px-4 text-center">
+//             <h2 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">
+//               Smart Home Inventory Management
+//             </h2>
+//             <p className="text-xl md:text-2xl mb-8 text-indigo-100 max-w-3xl mx-auto">
+//               Keep track of everything in your home effortlessly. Start your{" "}
+//               <strong>7-day free trial</strong> today!
+//             </p>
+//             <Link to="/signup">
+//               <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
+//                 Start Free Trial
+//               </button>
+//             </Link>
+//           </div>
+//         </motion.div>
+
+//         {/* Features Section */}
+//         <section className="py-24 bg-gray-50 relative">
+//           {/* Wave Background */}
+//           <div className="absolute top-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20 transform rotate-180"></div>
+
+//           <div className="container mx-auto px-4">
+//             <h3 className="text-3xl font-bold text-center mb-16">
+//               Powerful Features for Your Home
+//             </h3>
+//             <div className="grid md:grid-cols-3 gap-12">
+//               <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
+//                 <List className="h-12 w-12 text-[#4F46E5] mb-6" />
+//                 <h4 className="text-xl font-semibold mb-4">
+//                   Smart Organization
+//                 </h4>
+//                 <p className="text-gray-600">
+//                   Categorize and organize your items efficiently with our
+//                   intuitive system.
+//                 </p>
+//               </div>
+//               <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
+//                 <Calendar className="h-12 w-12 text-[#4F46E5] mb-6" />
+//                 <h4 className="text-xl font-semibold mb-4">Expiry Tracking</h4>
+//                 <p className="text-gray-600">
+//                   Never let items expire again. Get notifications before your
+//                   items reach their expiry date.
+//                 </p>
+//               </div>
+//               <div className="bg-white p-8 rounded-xl shadow-md transform hover:-translate-y-1 transition-all">
+//                 <Search className="h-12 w-12 text-[#4F46E5] mb-6" />
+//                 <h4 className="text-xl font-semibold mb-4">Quick Search</h4>
+//                 <p className="text-gray-600">
+//                   Find any item instantly with our powerful search
+//                   functionality.
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         </section>
+
+//         {/* Free Trial Explanation Section */}
+//         <section className="py-24 bg-white relative">
+//           <div className="container mx-auto px-4 text-center">
+//             <h3 className="text-3xl font-bold mb-4">
+//               Try Home Inventory for Free
+//             </h3>
+//             <p className="text-xl text-gray-600 mb-8">
+//               Experience all the features of Home Inventory with our{" "}
+//               <strong>7-day free trial</strong>. No credit card required!
+//             </p>
+//             <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+//               <div className="bg-gray-50 p-8 rounded-xl shadow-md">
+//                 <h4 className="text-xl font-semibold mb-4">What's Included</h4>
+//                 <ul className="text-gray-600 text-left list-disc list-inside">
+//                   <li>Full access to all features</li>
+//                   <li>Unlimited item tracking</li>
+//                   <li>Advanced analytics and reports</li>
+//                   <li>Priority customer support</li>
+//                 </ul>
+//               </div>
+//               <div className="bg-gray-50 p-8 rounded-xl shadow-md">
+//                 <h4 className="text-xl font-semibold mb-4">How It Works</h4>
+//                 <ul className="text-gray-600 text-left list-disc list-inside">
+//                   <li>Sign up in seconds</li>
+//                   <li>Start organizing immediately</li>
+//                   <li>Cancel anytime during the trial</li>
+//                   <li>No hidden fees</li>
+//                 </ul>
+//               </div>
+//             </div>
+//             <Link to="/signup" className="mt-12 inline-block">
+//               <button className="text-lg px-8 py-4 bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
+//                 Start Free Trial
+//               </button>
+//             </Link>
+//           </div>
+//         </section>
+
+//         {/* Call to Action Section */}
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ duration: 0.8 }}
+//           className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white py-16 relative"
+//         >
+//           {/* Wave Background */}
+//           <div className="absolute bottom-0 left-0 w-full h-24 bg-wave bg-repeat-x bg-cover opacity-20 transform rotate-180"></div>
+
+//           <div className="container mx-auto px-4 text-center">
+//             <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
+//             <p className="text-xl mb-8">
+//               Join thousands of organized households today. Start your{" "}
+//               <strong>7-day free trial</strong> now!
+//             </p>
+//             <Link to="/signup">
+//               <button className="text-lg px-8 py-4 bg-white text-black rounded-xl hover:bg-indigo-100 transform hover:scale-105 transition-all">
+//                 Create new account
+//               </button>
+//             </Link>
+//           </div>
+//         </motion.div>
+//       </main>
+
+//       <Footer />
+//     </div>
+//   );
+// };
+
+// export default Landing;

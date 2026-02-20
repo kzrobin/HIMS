@@ -1,33 +1,22 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { UserDataContext } from "../context/UserContext";
-import { X, LayoutDashboard, User, File, ShieldAlert } from "lucide-react";
+import { X, LayoutDashboard, User, File, ShieldAlert, LogOut, Crown } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const SideBar = ({ closeSidebar }) => {
-  const { user, backendUrl } = useContext(UserDataContext);
+  const { user, setUser, backendUrl } = useContext(UserDataContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Navigation items
   const navItems = [
-    {
-      path: "/dashboard",
-      icon: <LayoutDashboard size={20} />,
-      label: "Dashboard",
-    },
-    {
-      path: "/profile",
-      icon: <User size={20} />,
-      label: "Profile",
-    },
-    {
-      path: "/report",
-      icon: <File size={20} />,
-      label: "Report",
-    },
+    { path: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
+    { path: "/profile", icon: <User size={20} />, label: "Profile" },
+    { path: "/report", icon: <File size={20} />, label: "Report" },
   ];
 
-  // Add verification item if account is not verified
   if (!user?.isAccountVerified) {
     navItems.unshift({
       path: "/verify",
@@ -36,17 +25,34 @@ const SideBar = ({ closeSidebar }) => {
     });
   }
 
-  const logout = async () => {
-    navigate("/logout");
+  // Logout handler with modal
+  const handleLogout = async () => {
+    try {
+      await fetch(`${backendUrl}/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      setUser(null); // Clear user context
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      navigate("/login"); // Proceed anyway if error occurs
+    }
   };
 
   return (
-    <div className="flex flex-col bg-[#fdfdfd] h-[calc(100vh-80px)] rounded-md py-4 sm:py-6 border w-64 shadow-md">
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className="flex flex-col bg-white h-[calc(100vh-60px)] sm:h-[calc(100vh-80px)] w-64 sm:w-72 border-l border-gray-200 shadow-lg py-4 sm:py-6"
+    >
       {/* Close Button */}
-      <div className="flex justify-start px-4 mb-4">
+      <div className="flex justify-end px-4 mb-4">
         <button
           onClick={closeSidebar}
-          className="text-gray-700 hover:text-black transition-colors p-1 rounded-full hover:bg-[#f0eaea]"
+          className="text-[#344E41] hover:text-[#588157] p-1 rounded-full hover:bg-gray-100 transition-all focus:outline-none focus:ring-2 focus:ring-[#588157]"
+          aria-label="Close sidebar"
         >
           <X size={24} />
         </button>
@@ -55,55 +61,109 @@ const SideBar = ({ closeSidebar }) => {
       {/* User Profile Section */}
       <Link
         to="/profile"
-        className="flex items-center gap-3 bg-white px-4 py-3 rounded-lg shadow-sm mx-4 w-[88%]"
+        className="flex items-center gap-3 px-4 py-3 mx-4 rounded-lg bg-[#F9FAF5] hover:bg-gray-100 transition-all shadow-sm"
+        onClick={closeSidebar}
       >
         <img
-          src={user?.profilePicture || "/image.svg"}
-          alt="profile"
-          className="w-12 h-12 rounded-full object-cover"
+          src={user?.profilePicture || "https://via.placeholder.com/48"}
+          alt="Profile"
+          className="w-12 h-12 rounded-full object-cover border-2 border-[#588157]"
         />
-        <div className="flex flex-col w-[75%]">
-          <div className="text-lg font-semibold text-[#080809] overflow-hidden text-ellipsis whitespace-nowrap">
-            {user?.fullname?.firstname || "Guest"}{" "}
-            {user?.fullname?.lastname || ""}
+        <div className="flex-1 min-w-0">
+          <div className="text-base sm:text-lg font-semibold text-[#344E41] truncate">
+            {user?.fullname?.firstname || "Guest"} {user?.fullname?.lastname || ""}
           </div>
-          <div className="text-sm text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
-            {user?.email || "No email"}
-          </div>
+          <div className="text-xs sm:text-sm text-gray-500 truncate">{user?.email || "No email"}</div>
+          {!user?.isPremium && (
+            <span className="text-xs text-[#8B7E66] mt-1 inline-block">Free Trial</span>
+          )}
         </div>
       </Link>
 
       {/* Navigation Links */}
-      <div className="flex flex-col mt-6 space-y-1 px-4">
+      <nav className="flex flex-col mt-6 space-y-1 px-4">
         {navItems.map((item) => (
-          <div
+          <Link
             key={item.path}
-            onClick={() => {
-              navigate(item.path);
-              closeSidebar(); // Close sidebar on navigation
-            }}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+            to={item.path}
+            onClick={closeSidebar}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               location.pathname === item.path
-                ? "bg-[#3bcd5b9a] text-white"
-                : "text-gray-700 hover:bg-[#f2f2f2]"
+                ? "bg-[#588157] text-white shadow-md"
+                : "text-[#344E41] hover:bg-gray-100 hover:text-[#588157]"
             }`}
+            aria-label={item.label}
           >
             {item.icon}
-            <span className="text-sm font-medium">{item.label}</span>
-          </div>
+            <span>{item.label}</span>
+          </Link>
         ))}
-      </div>
+      </nav>
+
+      {/* Upgrade Section (if not premium) */}
+      {!user?.isPremium && (
+        <div className="px-4 mt-4">
+          <Link
+            to="/subscription"
+            onClick={closeSidebar}
+            className="flex items-center justify-center gap-2 py-2 bg-[#8B7E66] text-white rounded-lg hover:bg-[#6B6651] transition-all text-sm font-medium"
+          >
+            <Crown size={16} />
+            Upgrade to Premium
+          </Link>
+        </div>
+      )}
 
       {/* Logout Button */}
       <div className="mt-auto px-4">
         <button
-          onClick={logout}
-          className="w-full mt-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          onClick={() => setShowLogoutModal(true)}
+          className="w-full py-2 bg-[#344E41] text-white rounded-lg hover:bg-[#588157] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+          aria-label="Log out"
         >
+          <LogOut size={16} />
           Logout
         </button>
       </div>
-    </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
+            className="bg-white rounded-lg p-6 w-full max-w-sm mx-4 shadow-lg"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          >
+            <h3 className="text-lg font-semibold text-[#344E41] mb-4">Confirm Logout</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to log out of your HomeHaven account?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleLogout}
+                className="flex-1 py-2 bg-[#344E41] text-white rounded-lg hover:bg-[#588157] transition-all text-sm font-medium"
+              >
+                Yes, Log Out
+              </button>
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 py-2 bg-gray-200 text-[#344E41] rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
