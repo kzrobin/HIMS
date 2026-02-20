@@ -50,24 +50,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: 0,
   },
-  isPremium: {
-    type: Boolean,
-    default: false,
-  },
+
   profilePicture: {
     type: String,
     default:
       "https://res.cloudinary.com/kz-cloud/image/upload/v1739721991/gbl7pu9pdzw5w3wkxuqp.svg",
-  },
-  trialStartDate: {
-    type: Date,
-    default: Date.now,
-  },
-  trialEndDate: {
-    type: Date,
-    default: function () {
-      return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    },
   },
 });
 
@@ -84,10 +71,6 @@ userSchema.methods.comparePassword = async function (password) {
 
 userSchema.statics.hashPassword = async function (password) {
   return await bcrypt.hash(password, 10);
-};
-
-userSchema.methods.isTrialActive = function () {
-  return Date.now() <= this.trialEndDate;
 };
 
 const userModel = mongoose.model("User", userSchema);

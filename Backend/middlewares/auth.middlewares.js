@@ -21,16 +21,16 @@ module.exports.authUser = async (req, res, next) => {
   try {
     const decode = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userModel.findById(decode._id);
-
+    
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized access" });
+    }
     const userData = {
       _id: user._id,
       fullname: user.fullname,
       email: user.email,
-      isPremium: user.isPremium,
       isAccountVerified: user.isAccountVerified,
       profilePicture: user.profilePicture,
-      trialStartDate: user.trialStartDate,
-      trialEndDate: user.trialEndDate,
     };
     req.user = userData;
     return next();

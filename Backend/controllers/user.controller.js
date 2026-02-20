@@ -21,16 +21,16 @@ module.exports.registerUser = async (req, res, next) => {
 
   try {
     const { fullname, email, password } = req.body;
+
     // Hash the password
     const hashedPassword = await userModel.hashPassword(password);
+
     // Add user to database
     const user = await userService.createUser({
       firstname: fullname.firstname,
       lastname: fullname.lastname,
       email,
       password: hashedPassword,
-      trialStartDate: new Date(),
-      trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     // Generate authentication token
@@ -66,11 +66,8 @@ module.exports.registerUser = async (req, res, next) => {
         _id: user._id,
         fullname: user.fullname,
         email: user.email,
-        isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
-        trialStartDate: user.trialStartDate,
-        trialEndDate: user.trialEndDate,
       },
     });
   } catch (err) {
@@ -113,28 +110,15 @@ module.exports.loginUser = async (req, res, next) => {
   }
 
   const token = user.generateAuthToken();
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: false, // true in HTTPS production
-    sameSite: "lax", // allows cross-origin cookies
-  });
 
-  const temp = {
-    token,
-    user: {
-      _id: user._id,
-      fullname: user.fullname,
-      email: user.email,
-      isPremium: user.isPremium,
-      isAccountVerified: user.isAccountVerified,
-      profilePicture: user.profilePicture,
-      trialStartDate: user.trialStartDate,
-      trialEndDate: user.trialEndDate,
-      isTrialActive: user.isTrialActive(),
-    },
-  };
+    // set cookie
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
 
-  console.log("temp", temp);
 
   return res.status(200).json({
     token,
@@ -142,12 +126,8 @@ module.exports.loginUser = async (req, res, next) => {
       _id: user._id,
       fullname: user.fullname,
       email: user.email,
-      isPremium: user.isPremium,
       isAccountVerified: user.isAccountVerified,
       profilePicture: user.profilePicture,
-      trialStartDate: user.trialStartDate,
-      trialEndDate: user.trialEndDate,
-      isTrialActive: user.isTrialActive(),
     },
   });
 };
@@ -407,13 +387,6 @@ module.exports.updateName = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the trial is active or if the user is premium
-    if (!user.isTrialActive() && !user.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
-
     // Update the user's name
     user.fullname = fullname;
     await user.save();
@@ -424,11 +397,8 @@ module.exports.updateName = async (req, res, next) => {
         _id: user._id,
         fullname: user.fullname,
         email: user.email,
-        isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
-        trialStartDate: user.trialStartDate,
-        trialEndDate: user.trialEndDate,
       },
     });
   } catch (error) {
@@ -456,19 +426,6 @@ module.exports.updateProfilePicture = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the trial is active or if the user is premium
-    if (!user.isTrialActive() && !user.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
-
-    // Check if user is premium (if profile picture update is restricted to premium users)
-    if (!user.isPremium) {
-      return res.status(403).json({
-        message: "You must be a premium member to update your profile picture",
-      });
-    }
 
     // Update profile picture
     user.profilePicture = profilePicture;
@@ -480,11 +437,8 @@ module.exports.updateProfilePicture = async (req, res, next) => {
         _id: user._id,
         fullname: user.fullname,
         email: user.email,
-        isPremium: user.isPremium,
         isAccountVerified: user.isAccountVerified,
         profilePicture: user.profilePicture,
-        trialStartDate: user.trialStartDate,
-        trialEndDate: user.trialEndDate,
       },
     });
   } catch (error) {
@@ -519,44 +473,6 @@ module.exports.updatePassword = async (req, res, next) => {
     user.password = await userModel.hashPassword(newPassword);
     await user.save();
     return res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error });
-  }
-};
-
-module.exports.subscribePremium = async (req, res, next) => {
-  try {
-    const user = await userModel.findById(req.user._id); // Find the user by ID
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the user is already premium
-    if (user.isPremium) {
-      return res
-        .status(400)
-        .json({ message: "You are already a premium user" });
-    }
-
-    // Update the user to premium
-    user.isPremium = true;
-    await user.save();
-
-    return res.status(200).json({
-      message: "Subscription successful. You are now a premium user",
-      user: {
-        _id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-        isPremium: user.isPremium,
-        isAccountVerified: user.isAccountVerified,
-        profilePicture: user.profilePicture,
-        trialStartDate: user.trialStartDate,
-        trialEndDate: user.trialEndDate,
-      },
-    });
   } catch (error) {
     return res
       .status(500)
