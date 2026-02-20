@@ -43,12 +43,22 @@ module.exports.registerUser = async (req, res, next) => {
       subject: "Welcome to HIMS",
       html: welcomeMsg.replace(
         "{{name}}",
-        fullname.firstname + " " + fullname.lastname
+        fullname.firstname + " " + fullname.lastname,
       ),
     };
-    await sendMail(mailOptions);
+    try {
+      await sendMail(mailOptions);
+    } catch (mailError) {
+      console.error("Error sending welcome email:", mailError);
+    }
+
     // set cookie
-    res.cookie("token", token);
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
     // send response
     res.status(201).json({
       token,
@@ -103,7 +113,28 @@ module.exports.loginUser = async (req, res, next) => {
   }
 
   const token = user.generateAuthToken();
-  res.cookie("token", token);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false, // true in HTTPS production
+    sameSite: "lax", // allows cross-origin cookies
+  });
+
+  const temp = {
+    token,
+    user: {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      isPremium: user.isPremium,
+      isAccountVerified: user.isAccountVerified,
+      profilePicture: user.profilePicture,
+      trialStartDate: user.trialStartDate,
+      trialEndDate: user.trialEndDate,
+      isTrialActive: user.isTrialActive(),
+    },
+  };
+
+  console.log("temp", temp);
 
   return res.status(200).json({
     token,

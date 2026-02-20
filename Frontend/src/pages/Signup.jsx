@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { UserDataContext } from "../context/UserContext";
 import { Footer } from "../components/Footer";
 import { Package } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -22,12 +23,21 @@ const Signup = () => {
     lastname: "",
     email: "",
     password: "",
+    general: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleForm = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+    }));
+    // Clear field-specific errors on input change
+    setErrors((prev) => ({
+      ...prev,
+      [e.target.name]: "",
+      general: "",
     }));
   };
 
@@ -36,23 +46,29 @@ const Signup = () => {
     let validationErrors = {};
     let isValid = true;
 
-    if (formData.firstname.length < 2) {
+    if (!formData.firstname || formData.firstname.length < 2) {
       validationErrors.firstname = "First name must be at least 2 characters.";
       isValid = false;
     }
 
-    if (formData.lastname.length < 3) {
-      validationErrors.lastname = "Last name must be at least 3 characters.";
+    if (!formData.lastname || formData.lastname.length < 2) {
+      validationErrors.lastname = "Last name must be at least 2 characters.";
       isValid = false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!formData.email) {
+      validationErrors.email = "Email is required.";
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
       validationErrors.email = "Please enter a valid email address.";
       isValid = false;
     }
 
-    if (formData.password.length < 6) {
+    if (!formData.password) {
+      validationErrors.password = "Password is required.";
+      isValid = false;
+    } else if (formData.password.length < 6) {
       validationErrors.password = "Password must be at least 6 characters.";
       isValid = false;
     }
@@ -65,6 +81,7 @@ const Signup = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setIsSubmitting(true);
     try {
       const newUser = {
         fullname: {
@@ -78,172 +95,209 @@ const Signup = () => {
       const response = await axios.post(
         `${backendUrl}/users/register`,
         newUser,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       );
 
       if (response.status === 201) {
         setUser(response.data.user);
-        navigate("/dashboard");
         toast.success(
-          "Account created successfully! Please verify your account."
+          "Account created successfully! Please check your email to verify."
         );
+        const redirectTo = response.data.redirect || "/dashboard"; // Assuming redirect from backend
+        navigate(redirectTo);
       }
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error.message);
-      if (error.response?.status === 409) {
-        setErrors({ email: "Email already exists" });
-      } else if (error.response?.status === 500) {
-        toast.error("Internal Server error. Please try again later.");
+      if (!error.response) {
+        setErrors((prev) => ({
+          ...prev,
+          general:
+            "Unable to connect to the server. Please check your internet or try again later.",
+        }));
+      } else {
+        switch (error.response?.status) {
+          case 400:
+            setErrors((prev) => ({
+              ...prev,
+              general: "Invalid input data. Please check your details.",
+            }));
+            break;
+          case 409:
+            setErrors((prev) => ({
+              ...prev,
+              email: "This email is already registered.",
+            }));
+            break;
+          case 500:
+            setErrors((prev) => ({
+              ...prev,
+              general:
+                "Server error. Please try again later or contact support.",
+            }));
+            toast.error("Internal server error.");
+            break;
+          default:
+            setErrors((prev) => ({
+              ...prev,
+              general: "An unexpected error occurred. Please try again.",
+            }));
+        }
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-white">
+    <div className="min-h-screen flex flex-col bg-[#F9FAF5]">
       {/* Header */}
-      <header className="bg-gradient-to-br from-[#3BCD5B] via-[#2E8B57] to-[#3BCD5B] text-white py-4">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            {/* Logo and Title */}
-            <div className="flex items-center space-x-3">
-              <Package className="h-10 w-10 text-white" />
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
-                Home Inventory
-              </h1>
-            </div>
-
-            {/* Login Button */}
-            <div className="flex items-center space-x-4">
-              <Link to="/login">
-                <button className="bg-gradient-to-r from-[#4F46E5] to-[#9333EA] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all text-sm sm:text-base">
-                  Login
-                </button>
-              </Link>
-            </div>
-          </div>
+      <header className="bg-gradient-to-br from-[#A3B18A] to-[#588157] text-white py-4 shadow-md">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <Link to={'/'} className="flex items-center space-x-3">
+            <Package className="h-8 w-8 sm:h-10 sm:w-10" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+              HomeHaven
+            </h1>
+          </Link>
+          <Link to="/login">
+            <button className="px-4 py-2 bg-[#8B7E66] text-white rounded-lg hover:bg-[#6B6651] transition-all text-sm sm:text-base">
+              Login
+            </button>
+          </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
-        <form
-          onSubmit={submitHandler}
-          className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md text-sm border border-gray-200"
+      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200"
         >
-          <h2 className="text-3xl font-semibold text-[#1C542A] text-center mb-6">
-            Create an Account
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#344E41] text-center mb-6">
+            Get Started with HomeHaven
           </h2>
-
-          {/* First Name and Last Name */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                First name
-              </label>
-              <div className="flex items-center gap-3 w-full px-4 py-2 rounded-lg bg-gray-100">
+          {errors.general && (
+            <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
+              {errors.general}
+            </div>
+          )}
+          <form onSubmit={submitHandler}>
+            {/* First Name and Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name
+                </label>
                 <input
                   name="firstname"
                   type="text"
-                  required
                   value={formData.firstname}
                   onChange={handleForm}
-                  placeholder="First name"
-                  className="bg-transparent outline-none text-gray-800 flex-1"
+                  placeholder="John"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-[#588157] focus:ring-2 focus:ring-[#588157] outline-none text-gray-800 transition-all"
+                  disabled={isSubmitting}
                 />
+                {errors.firstname && (
+                  <span className="text-red-500 text-xs mt-1 block">
+                    {errors.firstname}
+                  </span>
+                )}
               </div>
-              {errors.firstname && (
-                <span className="text-red-500 text-sm">{errors.firstname}</span>
-              )}
-            </div>
-
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last name
-              </label>
-              <div className="flex items-center gap-3 w-full px-4 py-2 rounded-lg bg-gray-100">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name
+                </label>
                 <input
                   name="lastname"
                   type="text"
-                  required
                   value={formData.lastname}
                   onChange={handleForm}
-                  placeholder="Last name"
-                  className="bg-transparent outline-none text-gray-800 flex-1"
+                  placeholder="Doe"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-[#588157] focus:ring-2 focus:ring-[#588157] outline-none text-gray-800 transition-all"
+                  disabled={isSubmitting}
                 />
+                {errors.lastname && (
+                  <span className="text-red-500 text-xs mt-1 block">
+                    {errors.lastname}
+                  </span>
+                )}
               </div>
-              {errors.lastname && (
-                <span className="text-red-500 text-sm">{errors.lastname}</span>
-              )}
             </div>
-          </div>
 
-          {/* Email */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email address
-            </label>
-            <div className="flex items-center gap-3 w-full px-4 py-2 rounded-lg bg-gray-100">
+            {/* Email */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
               <input
                 name="email"
                 type="email"
-                required
                 value={formData.email}
                 onChange={handleForm}
-                placeholder="email@example.com"
-                className="bg-transparent outline-none text-gray-800 flex-1"
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-[#588157] focus:ring-2 focus:ring-[#588157] outline-none text-gray-800 transition-all"
+                disabled={isSubmitting}
               />
+              {errors.email && (
+                <span className="text-red-500 text-xs mt-1 block">
+                  {errors.email}
+                </span>
+              )}
             </div>
-            {errors.email && (
-              <span className="text-red-500 text-sm">{errors.email}</span>
-            )}
-          </div>
 
-          {/* Password */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <div className="flex items-center gap-3 w-full px-4 py-2 rounded-lg bg-gray-100">
+            {/* Password */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <input
                 name="password"
                 type="password"
-                required
                 value={formData.password}
                 onChange={handleForm}
-                placeholder="Password"
-                className="bg-transparent outline-none text-gray-800 flex-1"
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:border-[#588157] focus:ring-2 focus:ring-[#588157] outline-none text-gray-800 transition-all"
+                disabled={isSubmitting}
               />
+              {errors.password && (
+                <span className="text-red-500 text-xs mt-1 block">
+                  {errors.password}
+                </span>
+              )}
             </div>
-            {errors.password && (
-              <span className="text-red-500 text-sm">{errors.password}</span>
-            )}
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#3BCD5B] to-[#2E8B57] text-white font-medium hover:bg-gradient-to-r hover:from-[#2E8B57] hover:to-[#3BCD5B] transition-all"
-          >
-            Create Account
-          </button>
-
-          {/* Login Link */}
-          <p className="mt-4 text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-[#3BCD5B] hover:text-[#2E8B57] transition-colors"
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full py-3 rounded-lg text-white font-medium transition-all ${
+                isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#588157] hover:bg-[#344E41]"
+              }`}
             >
-              Login here
-            </Link>
-          </p>
-        </form>
+              {isSubmitting ? "Signing Up..." : "Create Account"}
+            </button>
+
+            {/* Login Link */}
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-[#588157] hover:text-[#344E41] transition-colors"
+              >
+                Log in here
+              </Link>
+            </p>
+          </form>
+        </motion.div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-6">
-        <Footer show={false} />
-      </footer>
+      <Footer show={false} />
     </div>
   );
 };
