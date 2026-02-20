@@ -13,7 +13,7 @@ import { UserDataContext } from "../../context/UserContext";
 import Layout from "../../components/layout/Layout";
 import { Link } from "react-router-dom";
 
-export const Report = () => {
+const Report = () => {
   const { user, items, getItems } = useContext(UserDataContext);
   const totalValue = items.reduce((sum, item) => sum + (item.value || 0), 0);
   const totalItems = items.length;
