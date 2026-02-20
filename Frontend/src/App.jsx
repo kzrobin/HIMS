@@ -8,7 +8,7 @@ import Signup from "./pages/user/Signup";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/user/Profile";
 import Logout from "./pages/user/Logout";
-import Report from "./pages/reports/Report";
+import { Report } from "./pages/reports/Report.jsx";
 import ResetPassword from "./pages/user/ResetPassword";
 import VerifyEmail from "./pages/user/VerifyEmail";
 import ProfileEdit from "./pages/user/ProfileEdit";
