@@ -8,6 +8,7 @@ import Signup from "./pages/user/Signup";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/user/Profile";
 import Logout from "./pages/user/Logout";
+import ReportExpairy from "./pages/reports/ReportExpairy";
 import Report from "./pages/reports/Report";
 import ResetPassword from "./pages/user/ResetPassword";
 import VerifyEmail from "./pages/user/VerifyEmail";
@@ -15,7 +16,6 @@ import ProfileEdit from "./pages/user/ProfileEdit";
 import ItemView from "./pages/item/ItemView";
 import Test from "./pages/misc/Test";
 import ItemEdit from "./pages/item/ItemEdit";
-import ReportExpairy from "./pages/reports/ReportExpairy";
 
 function App() {
   return (
