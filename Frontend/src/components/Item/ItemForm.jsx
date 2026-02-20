@@ -126,7 +126,7 @@ const ItemForm = ({ onClose }) => {
         onClose();
       }
     } catch (error) {
-      console.error("Error adding item:", error);
+      // console.error("Error adding item:", error);
       toast.error("Failed to add item. Please try again.");
     } finally {
       setUploading(false);

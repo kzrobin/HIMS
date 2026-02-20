@@ -8,13 +8,13 @@ import axios from "axios";
  * @returns {Promise<string>} - The secure URL of the uploaded image.
  */
 export const uploadImageToCloudinary = async (file) => {
-  console.log("Cloud function", file);
+  // console.log("Cloud function", file);
   const data = new FormData();
   data.append("file", file);
   data.append("upload_preset", "dsfwiufd239r4n23");
   data.append("cloud_name", "kz-cloud");
 
-  console.log("get called");
+  // console.log("get called");
   try {
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/kz-cloud/image/upload`,
@@ -24,10 +24,10 @@ export const uploadImageToCloudinary = async (file) => {
       }
     );
 
-    console.log("Checked out cloud function ", response);
+    // console.log("Checked out cloud function ", response);
     return response.data.secure_url;
   } catch (error) {
-    console.error("Error uploading image:", error);
+    // console.error("Error uploading image:", error);
     // throw error;
     return null;
   }

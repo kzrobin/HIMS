@@ -22,7 +22,7 @@ const DeleteItem = ({ onCancel, deleteItem, previousUrl = null }) => {
           setItemName(res.data.item.name);
         }
       } catch (error) {
-        console.error(error.response || error);
+        // console.error(error.response || error);
       } finally {
         setLoadingItem(false);
       }
@@ -49,7 +49,7 @@ const DeleteItem = ({ onCancel, deleteItem, previousUrl = null }) => {
       }
     } catch (error) {
       setErrorMessage("Error occurred. Please try again.");
-      console.error(error.response || error);
+      // console.error(error.response || error);
     } finally {
       setIsDeleting(false);
     }

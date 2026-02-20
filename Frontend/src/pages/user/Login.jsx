@@ -74,7 +74,7 @@ const Login = () => {
         withCredentials: true,
       });
 
-      console.log("res", response);
+      // console.log("res", response);
 
       if (response.status === 200) {
         setUser(response.data.user);

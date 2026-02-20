@@ -11,8 +11,8 @@ const itemRoute = require("./routes/item.routes");
 connectToDB();
 app.use(
   cors({
-    // origin: process.env.FRONTEMD_URL.split(","),
-    origin: ["http://localhost:5173", "http://192.168.0.103:5173"],
+    origin: process.env.FRONTEMD_URL.split(","),
+    // origin: ["http://localhost:5173", "http://192.168.0.103:5173"],
     credentials: true,
   }),
 );
@@ -21,10 +21,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  console.log("Received req");
-  next(); // Pass control to the next middleware/route
-});
+// app.use((req, res, next) => {
+//   console.log("Received req");
+//   next(); // Pass control to the next middleware/route
+// });
 
 app.get("/", (req, res) => {
   res.send("hello world");

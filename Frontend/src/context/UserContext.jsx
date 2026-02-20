@@ -19,11 +19,11 @@ const UserContext = ({ children }) => {
         withCredentials: true,
       });
       if (itemRes.status == 200) {
-        console.log(itemRes.data);
+        // console.log(itemRes.data);
         setItems(itemRes.data);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
