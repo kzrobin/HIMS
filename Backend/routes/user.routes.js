@@ -38,6 +38,7 @@ router.post(
   authMiddileware.authUser,
   userController.sendVerificationOtp
 );
+
 router.post(
   "/verify",
   [body("otp").isLength({ min: 6, max: 6 }).withMessage("Invalid OTP")],
@@ -102,12 +103,7 @@ router.put(
   authMiddileware.authUser,
   userController.updatePassword
 );
-// Subscribe to premium plan
-router.put(
-  "/subscribe-premium",
-  authMiddileware.authUser,
-  userController.subscribePremium
-);
+
 
 router.use("*", (req, res) => {
   return res.status(404).json({

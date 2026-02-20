@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const ItemModel = require("../models/item.model");
 const userModel = require("../models/user.model");
 
+//  add item
 module.exports.addItem = async (req, res) => {
   try {
     const {
@@ -21,40 +22,6 @@ module.exports.addItem = async (req, res) => {
     const user = req.user;
     if (!user) {
       return res.status(401).json({ message: "Unauthorized access." });
-    }
-
-    // Fetch the full user document to check trial status
-    const fullUser = await userModel.findById(user._id);
-    if (!fullUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    console.log(fullUser.isTrialActive());
-
-    // New check: if user is neither on trial nor premium, send error
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message:
-          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
-      });
-    }
-
-    // Check if the trial is active or if the user is premium
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
-
-    // Check if the user is non-premium and limit item creation to 25
-    if (!fullUser.isPremium) {
-      const itemCount = await ItemModel.countDocuments({ owner: user._id });
-      if (itemCount >= 25) {
-        return res.status(403).json({
-          message:
-            "Non-premium users can only add up to 25 items. Upgrade to premium to add more.",
-        });
-      }
     }
 
     // Create the new item
@@ -85,6 +52,7 @@ module.exports.addItem = async (req, res) => {
   }
 };
 
+// update Item
 module.exports.updateItem = async (req, res) => {
   try {
     console.log("update");
@@ -97,31 +65,6 @@ module.exports.updateItem = async (req, res) => {
     }
 
     const user = req.user;
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized access." });
-    }
-
-    // Fetch the full user document to check trial status
-    const fullUser = await userModel.findById(user._id);
-    if (!fullUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // New check for updateItem:
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message:
-          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
-      });
-    }
-
-    // Check if the trial is active or if the user is premium
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
-
     const item = await ItemModel.findOne({ _id: itemId, owner: user._id });
 
     if (!item) {
@@ -133,7 +76,6 @@ module.exports.updateItem = async (req, res) => {
     Object.keys(updates).forEach((key) => {
       item[key] = updates[key];
     });
-
     const updatedItem = await item.save();
 
     return res.status(200).json(updatedItem);
@@ -145,6 +87,7 @@ module.exports.updateItem = async (req, res) => {
   }
 };
 
+// delete item
 module.exports.deleteItem = async (req, res) => {
   try {
     const { itemId } = req.params;
@@ -154,31 +97,6 @@ module.exports.deleteItem = async (req, res) => {
     }
 
     const user = req.user;
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized access." });
-    }
-
-    // Fetch the full user document to check trial status
-    const fullUser = await userModel.findById(user._id);
-    if (!fullUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // New check for deleteItem:
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message:
-          "Your free trial has expired and you are not a premium user. Please subscribe to premium.",
-      });
-    }
-
-    // Check if the trial is active or if the user is premium
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
-
     const item = await ItemModel.findOne({ _id: itemId, owner: user._id });
 
     if (!item) {
@@ -200,13 +118,10 @@ module.exports.deleteItem = async (req, res) => {
   }
 };
 
+// get all itms
 module.exports.getAllItemsByUser = async (req, res) => {
   try {
     const userId = req.user._id;
-
-    if (!userId) {
-      return res.status(400).json({ message: "User not exsit" });
-    }
 
     const items = await ItemModel.find({ owner: userId });
     return res.status(200).json(items);
@@ -218,26 +133,11 @@ module.exports.getAllItemsByUser = async (req, res) => {
   }
 };
 
+// get specific item
 module.exports.getItem = async (req, res) => {
   try {
     const errors = validationResult(req);
     const user = req.user;
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized access." });
-    }
-
-    // Fetch the full user document to check trial status
-    const fullUser = await userModel.findById(user._id);
-    if (!fullUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the trial is active or if the user is premium
-    if (!fullUser.isTrialActive() && !fullUser.isPremium) {
-      return res.status(403).json({
-        message: "Your free trial has expired. Please subscribe to premium.",
-      });
-    }
 
     if (!errors.isEmpty()) {
       return res
@@ -245,9 +145,8 @@ module.exports.getItem = async (req, res) => {
         .json({ errors: errors.array(), message: "Invaild Item" });
     }
 
-    const { itemId } = req.params;
-
     // Fetch the item
+    const { itemId } = req.params;
     const item = await ItemModel.findById(itemId);
     if (!item || !item.owner.equals(req.user._id)) {
       return res.status(404).json({ message: "Item not found" });

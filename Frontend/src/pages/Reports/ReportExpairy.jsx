@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import Layout from "../../components/Layout";
+import Layout from "../../components/layout/Layout";
 import { UserDataContext } from "../../context/UserContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";

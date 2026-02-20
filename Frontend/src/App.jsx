@@ -1,23 +1,21 @@
-import { Routes, Route } from "react-router-dom";
-import UserProtectedWrapper from "./pages/UserProtectedWrapper";
-import NonAuthWrapper from "./pages/NonAuthWrapper"; // Import the new wrapper
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
 import "./index.css";
-import Logout from "./pages/Logout";
-import Report from "./pages/Report";
-import ResetPassword from "./pages/ResetPassword";
-import VerifyEmail from "./pages/VerifyEmail";
-import ProfileEdit from "./pages/ProfileEdit";
-import ItemView from "./pages/ItemView";
-import Test from "./pages/Test";
-import Subscription from "./pages/Subscription";
-import Payment from "./pages/Payment";
-import ItemEdit from "./pages/ItemEdit";
-import ReportExpairy from "./pages/Reports/ReportExpairy";
+import { Routes, Route } from "react-router-dom";
+import UserProtectedWrapper from "./pages/wrappers/UserProtectedWrapper";
+import NonAuthWrapper from "./pages/wrappers/NonAuthWrapper";
+import Landing from "./pages/home/Landing";
+import Login from "./pages/user/Login";
+import Signup from "./pages/user/Signup";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Profile from "./pages/user/Profile";
+import Logout from "./pages/user/Logout";
+import Report from "./pages/reports/Report";
+import ResetPassword from "./pages/user/ResetPassword";
+import VerifyEmail from "./pages/user/VerifyEmail";
+import ProfileEdit from "./pages/user/ProfileEdit";
+import ItemView from "./pages/item/ItemView";
+import Test from "./pages/misc/Test";
+import ItemEdit from "./pages/item/ItemEdit";
+import ReportExpairy from "./pages/reports/ReportExpairy";
 
 function App() {
   return (
@@ -40,17 +38,7 @@ function App() {
           </NonAuthWrapper>
         }
       />
-      <Route path="/subscription" element={<Subscription />} />
       <Route path="/test" element={<Test />} />
-      <Route
-        path="/payment"
-        element={
-          <UserProtectedWrapper>
-            <Payment />
-          </UserProtectedWrapper>
-        }
-      />
-
       {/* Protected Routes */}
       <Route
         path="/dashboard"

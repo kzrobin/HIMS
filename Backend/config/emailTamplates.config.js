@@ -38,7 +38,7 @@ module.exports.welcomeMsg = `<!DOCTYPE html>
 </head>
 <body>
     <div class="container">
-        <h2>Welcome to Home Inventory and Management System!</h2>
+        <h2>Welcome to Home Haven and Management System!</h2>
         <p>Dear {{name}},</p>
         <p>We are thrilled to have you on board. HIMS is designed to help you track and manage your home inventory effortlessly.</p>
         <p>Start adding and managing your items today!</p>
